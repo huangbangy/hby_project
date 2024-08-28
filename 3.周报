@@ -320,3 +320,50 @@ ENVmonitor -g -expander_slot -manuinfo
 
 其它：
 协助测试zhuanghaojian完成电源测试
+
+======================
+问题单处理：
+AA04012 【D113】116设备执行cli命令点deu0~deu2即zone0~zone2区域定位灯时，设备ALM指示灯仍为熄灭状态（解决）
+AA34900 【5024-E-V2+拓展槽】适配电压风扇开关及告警获取（解决）
+SAD40187 【D104 电源】3060-V2插一个1200W电源，上控端会报错（解决）
+AA35336 【5024-E+拓展槽】适配ENVmonitor -h提示信息 （解决）
+HWD96021 【CX3000 V300R001 整机适配700W电源模块的ACOK信号评估处理】评估存储设备的上的700W电源模块的ACOK信号是否去掉（解决）
+SAD40858 【D105 装备】进装备模式下将风扇模式设置为auto后，查看还是manual（定位中）
+SAD42518 【D110 ENVmonitor】ENVmonitor -s -uart2 -BMC_0命令是MC相关的调测命令，只有-H和计算板卡才有BMC，请在其余设备上屏蔽下（定位中）
+AA05028 【需求单】VX1600 V300R001 经济型BIOS 014版本合入ISO（审核）
+HWD96021 【CX3000 V300R001 整机适配700W电源模块的ACOK信号评估处理】评估存储设备的上的700W电源模块的ACOK信号是否去掉（审核）
+
+拓展槽：
+新增七个接口，验证ok，xiepushen同步验证装备中 
+ENVmonitor -g -subcard -expander_slot
+ENVmonitor -g -hwver -expander_slot
+ENVmonitoren -s -manuinfo -expander_slot filename '8z!Y+5o&' 
+ENVmonitor -g -manuinfo -expander_slot
+ENVmonitor -t -expander_slot fan -enable
+ENVmonitor -t -expander_slot fan -disable
+ENVmonitor -g -fan -expander_slot
+
+mib：拉通liusuqian沟通mib适配详情，初步计划基于V3不同硬件结构统一函数接口提供给liusuqian
+
+测试问题分析：
+定位mateng模拟主板高温显示为critical状态，原因为代码逻辑判断有误，已提单预计116解决
+协助测试zhuanghaojian完成拓展槽测试用例编写
+需求：
+shiyan需求需gui界面显示国产化存储cpu型号，目前已拉通，为liusuqian gui实现，底层不做接口改变
+
+问题单处理：
+AA36698 【5024-E-V2+拓展槽】同步branchv2-patchIPSAN-R2201.112_CX5024-V2_SAD43045分支ENVmonitor修改到主线（定位解决）
+HWD96021 【CX3000 V300R001 整机适配700W电源模块的ACOK信号评估处理】评估存储设备的上的700W电源模块的ACOK信号是否去掉（定位解决）
+SAD43045 【D111P01 CX5024-V2 PCIe扩展框】请根据上控类型配置 plx 的工作方式，即透明桥非透明桥，且实现透明桥情况下的设备接入识别及数据传输（审核）
+AA27899 【5024-V2+拓展槽】适配ENVmonitor获取子卡信息（处理）
+AA34900 【5024-E-V2+拓展槽】适配电压风扇开关及告警获取（处理）
+AA30500 【D115 116盘位】ENVtool命令模拟cpu风扇转速过高和过低告警后恢复正常，但数码管未恢复正常（验证）
+AA05641 【D113 CX18116-V3】产线发货的设备配置的是2000W欧陆通的电源，未带SN码（验证）
+AA05652 【D113 CX18116-V3】设备cpu风扇有一个坏了，但日志告警打印的是系统风扇（验证）
+
+拓展槽：同步116ok，验证ok
+
+其它：
+请假一天
+协助sujunkang定位海光+X710卡限速问题，已有方案
+
