@@ -1,5 +1,37 @@
+./116xfwdl -s 查看fwver版本
+ cat /usr/local/hstor/sms_install/etc/tmpfile_temperature_table 看磁盘温度
+ smartset脚本在storservice调用生成的文件
+ tmpfile_temperature_table读的smart_info.tmp
+  smart_info.tmp文件是用smartctl -a /dev/sda这种操作给读出来的
+Loc2Acsl2dev.sh 读取disk和sd设备的对应关系
 EXPORT_SYMBOL(unv_product); 是 Linux 内核中的一个宏，用于将一个全局变量、函数或结构体等导出给用户空间。
 
 kzalloc 函数用于分配内存，它与 kmalloc 函数类似，但是 kzalloc 会在分配的内存区域自动初始化为零。这样可以避免在使用内存之前需要手动初始化每个元素的问题
 
 RAID 1 通过将数据完全复制到两个或多个磁盘上实现数据冗余。
+
+Revision: 24041
+Author: c08801
+Date: 2022年9月15日 17:26:48
+Message:
+SAD36517 【D090 b/4b/4错误码】环境中上报b/4b/4错误码未处理，SATA添加b/4b/4错误模拟
+----
+Modified : /branch/CX1800V2_bugfix/ISO_Base/ISO/Modules/base_CentOS7/file/boot/vmlinuz-5.4.20
+Modified : /branch/CX1800V2_bugfix/ISO_Base/ISO/Modules/driver_CentOS7_common/file/usr/bin/error_simulator.sh
+Modified : /branch/CX1800V2_bugfix/driver/linux_kernel_5.4.20/drivers/ata/libata-scsi.c
+Revision: 23999
+Author: c06732
+Date: 2022年9月14日 17:04:44
+Message:
+SAD36225【D090 b/4b/4错误码】环境中上报b/4b/4错误码未处理
+----
+Modified : /branch/CX1800V2_bugfix/trunk/storware/kernel/disk/pd_error.c
+Modified : /branch/CX1800V2_bugfix/trunk/storware/kernel/disk/pd_error.h
+
+
+{
+1:模拟错误码，disk层根据错误码类型做出相应的处理   
+2:错误模拟是加在io命令完成那部分代码的, 必须打流才会上报模拟的错误码（dd读写一块盘可以实现该操纵）
+3：错误模拟之后磁盘会下电后上电
+
+}

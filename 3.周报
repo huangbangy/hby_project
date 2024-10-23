@@ -449,6 +449,41 @@ AA36459 ¡¾D115 ARM-SDS¡¿ öïÅô7.10Éè±¸ÔÚÖ÷ÏµÍ³²é¿´eth0ÊÇupµÄ£¬ÅäÓÐIP£¬ÉèÖÃÁËÉý¼¶½
 
 ================================================================
 2024.10.11
+ÎÊÌâµ¥´¦Àí£º
 AA47238 ¡¾×°±¸¡¿16V3,18V3×°±¸½Å±¾Ö§³ÖË«1200wµçÔ´£¨U1A-D11200-DRB-6KV-Z£©
 AA47804 ¡¾D116 sds¡¿skylake·þÎñÆ÷Ê¹ÓÃÍòÕ×¿Ú½øÐÐÉý¼¶£¬½øÈëÐ¡ÏµÍ³ºó¿´²»µ½ÍòÕ×¿Ú
 AA44711 ¡¾D116P01 PCIEÀ©Õ¹²Û¡¿Õï¶ÏÈÕÖ¾ÖÐÃ»ÓÐÊÕ¼¯À©Õ¹²Û×Ó¿¨µÄÐÅÏ¢
+SAD43317 ¡¾ÐèÇóµ¥¡¿¡¾V3Éè±¸¡¿µ±Éè±¸µÄÓ²ÅÌÎÂ¶Èµ½60¡æÊ±£¬ÈÕÖ¾ÐèÒª´òÓ¡Ó²ÅÌÎÂ¶ÈÐÅÏ¢¡£
+
+´óÅÌÎ»U002×°±¸ÑéÖ¤ÐèÇó£¨20%£©
+»·¾³×¼±¸ uÅÌÖÆ×÷ ÐèÇóÃ÷È· ¿ªÊ¼Ö÷°åÑéÖ¤
+
+²âÊÔÎÊÌâ·ÖÎö£º
+ÂíÌÚ1848V3ÎÂ¶ÈµÍÓÚÏÂµ÷ÎÂ¶È£¬·çÉÈÈÔÉÏµ÷£¬Èí¼þ·ÖÎöÎÞÎó£¬Ä¿Ç°houqiang·ÖÎöÖÐ
+yuyani´ÅÅÌÎÂ¶È´òÓ¡ÓÐÎóÈÕÖ¾´òÓ¡ÒÉÎÊ·ÖÎö£¬¾­·ÖÎö£¬¸ÃÈÕÖ¾´òÓ¡½öÔÚµ²Î»±ä»¯Ê±²Å»á´òÓ¡
+
+
+=================================================================
+²úÏßÎÊÌâ´¦Àí£º
+U002×°±¸½ø¶È£º95%£¬Ê£Óà¿Õ°×²¹¶¡´òÈëÊÇ·ñokÎ´²â
+
+¾ÖµãÎÊÌâ´¦Àí£º
+Áú¸ÛÅ©Òµ¾ÖÔÆ¼ÆËã¼à¿ØÆ½Ì¨ÏîÄ¿VX1848-V2·þÎñÒì³£
+Ô­Òò£ºÏÖ³¡Éý¼¶iso°æ±¾²»Ö§³ÖNI05MB48D´îÅäNI05MB48S×éºÏ£¬Ä¿Ç°Éý¼¶95P07ÒÑ½â¾ö
+
+ÎÊÌâµ¥´¦Àí£º
+ÉóºË£º
+AA51040 ¡¾ÐèÇó¡¿ °Ñ¸ÃºÏÈëÖ÷ÏßµÄÎÊÌâµ¥HWD115861ºÏÈëµ½´óÅÌÎ»UÅÌ·ÖÖ§ÉÏ
+¿ª·¢ÐÞ¸Ä£º
+AA44147 ¡¾116P01 CCB¡¿ÇëÆÀÉóÊÇ·ñÐèÒª½«ENVmonitorÊä³öµÄµç³ØÐÅÏ¢ÖÐµÄµç³ØÄêÁäºÍ³õÊ¼ÅäÖÃÊ±¼äÉ¾³ý
+AA44711 ¡¾D116P01 PCIEÀ©Õ¹²Û¡¿Õï¶ÏÈÕÖ¾ÖÐÃ»ÓÐÊÕ¼¯À©Õ¹²Û×Ó¿¨µÄÐÅÏ¢
+AA46163 ¡¾D116P01 PICEÀ©Õ¹²Û¡¿ENVmonitor -g -manuinfo -expander_slotÃüÁî¸ÅÂÊ³öÏÖ²éÑ¯Ê§°Ü£ºERROR [1007]  read the eeprom register [00] failed£¬Ò»¶ÎÊ±¼äºóÓÖ»Ö¸´Õý³£
+SAD40858 ¡¾D105 ×°±¸¡¿½ø×°±¸Ä£Ê½ÏÂ½«·çÉÈÄ£Ê½ÉèÖÃÎªautoºó£¬²é¿´»¹ÊÇmanual
+SAD43520 ¡¾D106P04¡¿116Éè±¸zoneÇøÓòµÆµãµÆ²ßÂÔ£¬ÇëÊµÏÖ
+
+²âÊÔÎÊÌâ´¦Àí£º
+´¦Àíhuangxiaoson 5024-H deuÊÇ¶¨Î»×´Ì¬È«¾ÖµÆ²»ÉÁË¸Ô­Òò£¬ÎªÂß¼­Î´ºÏÈë¸Ã¹¦ÄÜ
+´¦Àíluoqijuan²åÈë×Ó¿¨¶Á²»µ½×Ó¿¨ÐÅÏ¢£¬½»»»×Ó¿¨Ö®ºó½â¾ö£¬¶¨Î»µ½ÎªÎ´²å½ô×Ó¿¨Ô­Òò
+
+ÆäËü£º
+PBC±àÐ´
