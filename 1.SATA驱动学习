@@ -35,3 +35,6 @@ Modified : /branch/CX1800V2_bugfix/trunk/storware/kernel/disk/pd_error.h
 3：错误模拟之后磁盘会下电后上电
 
 }
+
+SATA驱动工作的核心是将系统与SATA硬盘进行连接。从SATA硬盘传输的数据会通过SATA总线发送到SATA控制器。SATA驱动将读/写请求发送给SATA控制器，
+然后控制器根据请求的指令，从硬盘读取相应的数据块并将其传输回驱动程序，最终通过文件系统将数据提供给用户。
