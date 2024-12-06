@@ -16,3 +16,25 @@ linux调度算法的概念就是根据进程的不同类型分配不同比例的时间片
 
 request_irq: 需要手动管理中断的分配和释放，适用于需要更多控制的场景。
 devm_request_irq: 自动管理中断的分配和释放，简化代码并减少潜在的资源管理问题，适用于使用设备管理器的驱动程序。
+
+static int scsi_host_init(struct Scsi_Host *host)
+{
+    int ret;
+
+    // 初始化任务队列
+    tasklet_init(&host->scsi_tasklet, scsi_tasklet_action, (unsigned long)host);
+
+    // 注册中断处理程序
+    ret = request_irq(host->irq, scsi_interrupt_handler, IRQF_SHARED, "scsi", host);
+    if (ret) {
+        printk(KERN_ERR "Failed to request IRQ %d\n", host->irq);
+        return ret;
+    }
+
+    return 0;
+}
+软中断（下部分）
+中断（上部分）
+
+=====
+看到157
