@@ -653,3 +653,25 @@ AA27931 ¡¾D114P01¡¿Ö´ÐÐµÄetcrc.localÖ´ÐÐ¹ý³ÌÖÐÓÐmkcompfile.sh½Å±¾Ö´ÐÐ±¨´í£¨ÉóºË£
 ÆäËü¼°²âÊÔÎÊÌâ£º
 ¶¨Î»ucsÃ»ÓÐºÏÈëENVmonitor¶¨Ê±ÈÎÎñµÄÎÊÌâ£¬ÐèÌáµ¥ºÏÈë
 ÌýÈ¡Ó²¼þ·çÉÈÄ£¿é½²½â
+
+==============================================================================================================
+ÖÜ±¨12.23-12.27
+ÎÊÌâµ¥´¦Àí£º
+ÒÑÐÞ¸Ä£º
+AA79494 ¡¾D119 crontab¡¿Çë½«system_space_check.sh½Å±¾¶¨Ê±ÈÎÎñºÏÈëUCS2.0
+AA38874 ¡¾D115 SATAµãµÆ¡¿CX1816-V3Éè±¸¶Ô´ÅÅÌ½øÐÐ°²È«ÏÂµç£¬ÏÂµçÍê³ÉÊÖ¶¯½«´ÅÅÌ°Î³ö£¬²ÛÎ»ÒÀÈ»µãµÆ²»ÄÜÁ¢¿ÌÏ¨Ãð
+AA45074 ¡¾CCB PICEÀ©Õ¹²Û¡¿PICEÀ©Õ¹²ÛµÄ·çÉÈ½ö¿É²éÑ¯¸æ¾¯×´Ì¬£¬ÎÞ¸æ¾¯¹¦ÄÜ£¬ÇëCCBÌÖÂÛÏàÓ¦µÄ¸æ¾¯²ßÂÔ
+AA81928 ¡¾CX18V3 hygon cpu¡¿ÊÊÅäENVmonitorÕûÌå¹¦ÄÜ£¨ÀàÐÍ£¬id£¬Ö÷±³°å»ñÈ¡£¬µç³Ø£¬µçÔ´£¬·çÉÈµÈ£©
+¶¨Î»ÖÐ£º
+AA80610 ¡¾D120 Battery¡¿120°æ±¾Éè±¸²åµ¥µç³Ø»á´¥·¢µç³ØFault¸æ¾¯
+AA70839 Ò×ÓÃÐÔÎÊÌâ 114P01¡¿V3´æ´¢¶ÔÍâ·¢»õ´æÔÚÇ¦Ëáµç³ØºÍÌúï®µç³ØµÄÇé¿ö£¬ÇÒÁ½ÖÖµç³Ø²»ÄÜ»ì²åÐèÒªÔö¼Ó»ì²å¸æ¾¯
+AA75000 ¡¾±³°åEEPROMµ÷ÊÔ¡¿ÇëÔÚha_eeprom_debugÃüÁîÔö¼Ó¶ÁÐ´¹¦ÄÜÎÞ¹ØµÄEEPROM¼Ä´æÆ÷£¬ÓÃÓÚÔÚ²»ÆÆ»µ»·¾³µÄÇé¿öÏÂ£¬²âÊÔ¶ÁÐ´EEPROM¹¦ÄÜ¡£
+ÑéÖ¤£º
+AA58060 ¡¾»ØÍËAA12219¡¿¼æÈÝCX18V2×°±¸ºÍÖ÷»ú×°±¸½Å±¾
+
+º£¹âCX1800V3ÏîÄ¿£º
+º£¹âcpu»áÒé²ÎÓë
+ENVmonitorÐÞ¸Ä50%
+
+²âÊÔÎÊÌâ¶¨Î»£º
+matengµ¥µç³Ø¸æ¾¯ÎÊÌâ¶¨Î»£¬ÎªÊÊÅä»ìµç³Ø¸æ¾¯ÒýÆð£¬ÒÑÌáµ¥£¬ÒÑÐÞ¸Ä
