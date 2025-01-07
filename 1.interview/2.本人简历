@@ -5,3 +5,16 @@
 1：熟悉C语言，shell语言，Makefile
 2：了解linux启动原理，系统调用，进程管理，文件系统等
 3：熟悉linux内核调试工具：kgdb，kdump，trace
+4：了解存储raid等技术
+
+
+
+raid
+{
+Normal --(磁盘失效)--> Degrade --(更换磁盘)--> Rebuild --(重建完成)--> Normal
+          |
+          | (多块磁盘失效)
+          v
+        Failed
+同步过的条带通过减少奇偶校验计算、提高数据一致性、优化写操作和减少写放大效应，从而提高了随机写操作的性能。        
+}
