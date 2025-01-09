@@ -4,3 +4,13 @@ sysfs 是一个虚拟文件系统，提供了一种结构化的方式来访问内核对象及其属性。以下是如
 我们是mpt2sas对应2008，3sas对应3008，35sas对应3409和3808
 
 4个phy组成一个宽端口
+
+{0，0，0，0}由四部分组成
+disk_loc.adapter disk_loc.port disk_loc.enclosure disk_loc.slot
+
+struct disk_location {
+    u32 adapter;    // 适配器编号
+    u32 port;       // 端口号
+    u32 enclosure;  // 扩展柜编号
+    u32 slot;       // 插槽编号
+};
