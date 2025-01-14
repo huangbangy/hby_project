@@ -19,6 +19,7 @@ struct disk_location {
 
 驱动层通过接口通知disk层发生事件，如下电等操作
 
+lsscsi列出所有的scsi设备
 
 deu_mgt_get_notify_from_driver  sas模块和deu模块的接口
 
@@ -46,6 +47,82 @@ notify_process_events处理如下上报的事件
 _scsi_add_device 函数负责向系统中添加 SAS 设备，包括读取设备配置页、检查设备状态、处理特定产品需求、
 初始化设备结构体以及将设备添加到系统中。通过详细的步骤和错误处理机制，确保设备能够正确地被识别和管理。
 比如上下电五次不成功就给它下电点黄灯
+{
+[root@localhost-0 ~]# cli
+<Storage>disk display list
+Disk(s):12
+Disk 1:
+  1,0,0,1 - I/F Type: SATA Capacity: 480 GB/447 GiB Serial No: PHYG120200L1480BGN
+Disk 2:
+  1,0,0,3 - I/F Type: SATA Capacity: 3.00 TB/2.73 TiB Serial No: Z3046599
+Disk 3: 
+  1,0,0,7 - I/F Type: SATA Capacity: 4.00 TB/3.64 TiB Serial No: Z4F00P7A
+Disk 4:
+  1,0,0,13 - I/F Type: SATA Capacity: 1.00 TB/932 GiB Serial No: WD-WMATV0872146
+Disk 5:
+  1,0,0,15 - I/F Type: SATA Capacity: 1.00 TB/932 GiB Serial No: WD-WMATV43   
+Disk 6:
+  1,0,0,19 - I/F Type: SATA Capacity: 180 GB/168 GiB Serial No: CVKI316103UL180CGN
+Disk 7:
+  1,0,0,21 - I/F Type: SATA Capacity: 2.00 TB/1.82 TiB Serial No: WD-WCC4M6YRK9X6
+Disk 8:
+  1,0,1,3 - I/F Type: SATA Capacity: 1.00 TB/932 GiB S
+Disk 9:
+  1,0,1,7 - I/F Type: SATA Capacity: 4.00 TB/3.64 TiB Serial No: WD-WX62D40A9T0J
+Disk 10:
+  1,0,1,13 - I/F Type: SATA Capacity: 3.00 TB/2.73 TiB Serial No: WD-WMC1T4328240
+Disk 11:
+  1,0,1,15 - I/F Type: SATA Capacity: 6.00 TB/5.46 TiB Serial No: K1G31G5B
+Disk 12:
+  1,0,1,19 - I/F Type: SATA Capacity: 180 GB/168 GiB Serial No: CVKI316102WG180CGN
+}
+{
+[root@localhost-0 ~]# lsscsi
+[5:0:0:0]    disk    ATA      TS32GMTS400      5CH1  /dev/sda
+[7:0:1:0]    disk    ATA      ST3000VX002-1F41 CV13  /dev/sdc
+[7:0:2:0]    disk    ATA      ST4000NM0024-1HT SN02  /dev/sdd
+[7:0:3:0]    disk    ATA      W  DC WD1002FBYS-0 0C05  /dev/sde
+[7:0:4:0]    disk    ATA      WDC WD1002FBYS-0 0C06  /dev/sdf
+[7:0:6:0]    disk    ATA      WDC WD20PURX-64P 0A80  /dev/sdh  
+[7:0:7:0]    enclosu LSIexp   35x36r           0640  -
+[7:0:8:0]    disk    ATA      ST31000525SV     CV12  /dev/sdi
+[7:0:9:0]    disk    ATA      WDC WD40PURX-64A 0A80  /dev/sdj
+[7:0:10:0]   disk    ATA      WDC WD30EURS-63S 0A80  /dev/sdk
+[7:0:11:0]   disk    ATA      WDC WD6002FRYZ-0 1M02  /dev/sdl
+[7:0:14:0]   enclosu LSIexp   35x36r           0640  -
+[7:0:16:0]   disk    ATA      INTEL SSDSC2CT18 335u  /dev/sdb
+[7:0:17:0]   disk    ATA      INTEL SSDSC2KG48 0132  /dev/sdg
+[7:0:19:0]   disk    ATA      INTEL SSDSC2CT18 335u  /dev/sdm
+}
+
+cli上电日志打印
+{
+Jan 10 17:02:29 localhost-0 root: hby
+Jan 10 17:02:39 localhost-0 kernel: [DISK_PD_CMD_ERR] no disk associated with Slot 1:0:0:3 in system
+Jan 10 17:02:39 localhost-0 kernel: [DISK_PD_CMD_INFO] Set disk[1,0,0,3] power on
+Jan 10 17:02:39 localhost-0 kernel: [DISK_PD_CMD_INFO] Sas enclosure loc[1,0,0,3],power on, ret:0
+Jan 10 17:02:39 localhost-0 kernel: [DISK_PD_CMD_INFO] Disk[1,0,0,3] power on successfully
+Jan 10 17:02:40 localhost-0 kernel: [DISK_DEU_INFO] Exp event:Storware set disk power on,DEU[1,0,0],MID[2],Type[2],Event[8],Loc[3],ID[7],Time(10ms)[456518],Value1[0x0],Value2[0x0]
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: sas discovery event: (start)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:41 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:41 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(21), attached_handle(0x 0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+
+Jan 10 17:02:41 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+printk("MPT3SAS add device start: handle(0x%04x),phy(%d)\n",handle,sas_device_pg0.PhyNum);
+
+*1A）Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+printk(MPT3SAS_INFO_FMT "detecting: handle(0x%04x), ""sas_address(0x%016llx), phy(%d)\n", ioc->name, handle,
+
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+}
+
 
 cli上电流程
 {
@@ -53,5 +130,9 @@ cli上电流程
     sas deu类型的下发page页
     poll_edge_log deu的日志轮询
     _scsih_sas_discovery_event 发现事件发现磁盘
-
+    _mpt3sas_fw_work->_scsih_sas_host_add（磁盘上线为0的时候给它执行这个函数分配的，中途上电不走此分支）
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
+*1A）    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device (包括磁盘未准备就绪时我司做的上下电处理_lsi_sasdrv_dev_poweroffon)
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_start_unit
 }
