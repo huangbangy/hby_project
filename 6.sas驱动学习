@@ -121,18 +121,48 @@ printk("MPT3SAS add device start: handle(0x%04x),phy(%d)\n",handle,sas_device_pg
 printk(MPT3SAS_INFO_FMT "detecting: handle(0x%04x), ""sas_address(0x%016llx), phy(%d)\n", ioc->name, handle,
 
 Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
-}
-
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(retry_ua)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x06,0x29,0x01]
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+*1B）Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:41 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(25), count(11) （SAS 扩展器设备的句柄（handle），SAS 扩展器设备的机箱（enclosure）的句柄，拓扑变化开始的物理端口编号，拓扑变化涉及的物理端口数量）
+}Jan 10 17:02:41 localhost-0 kernel:     phy(25), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(26), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(27), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(28), attached_handle(0x0011): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(29), attached_handle(0x0011): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(30), attached_handle(0x0011): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(31), attached_handle(0x0011): target responding: link rate: new(0x0b), old(0x00)
+*1C）Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: sas discovery event: (stop)
+Jan 10 17:02:42 localhost-0 kernel: [DISK_DEU_INFO] Exp event:Phy change,DEU[1,0,0],MID[10],Type[3],Event[17],Loc[3],ID[1],Time(10ms)[456615],Value1[0x0],Value2[0x0]
+Jan 10 17:02:42 localhost-0 kernel: [DISK_DEU_INFO] Exp event:PHY warning: DEU[1,0,0],PHY[3], idw[0],dp[0],dl[0],rstf[0],pch[2], cv(pe)[0],dp(cv)[0]
 
 cli上电流程
 {
     判断deu类型
     sas deu类型的下发page页
     poll_edge_log deu的日志轮询
-    _scsih_sas_discovery_event 发现事件发现磁盘
-    _mpt3sas_fw_work->_scsih_sas_host_add（磁盘上线为0的时候给它执行这个函数分配的，中途上电不走此分支）
+    _mpt3sas_fw_work->_scsih_sas_discovery_event 发现事件发现磁盘
+    _mpt3sas_fw_work->_scsih_sas_discovery_event->_scsih_sas_host_add（磁盘上线为0的时候给它执行这个函数分配的，中途上电不走此分支）
     _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
     _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
 *1A）    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device (包括磁盘未准备就绪时我司做的上下电处理_lsi_sasdrv_dev_poweroffon)
-    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_start_unit
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_start_unit
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_report_luns->_scsih_determine_disposition(解析 ioc_status 和 scsi_state: 根据这些字段确定设备的状态和处理建议,retry四次，ready时退出)
+*1B）  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug （SAS 扩展器设备的句柄（handle），SAS 扩展器设备的机箱（enclosure）的句柄，拓扑变化开始的物理端口编号，拓扑变化涉及的物理端口数量）
+*1C） _mpt3sas_fw_work->_scsih_sas_discovery_event->_scsih_sas_discovery_event 发现事件发现磁盘
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug(句柄,速率 )
+    poll_edge_log deu的日志轮询
 }
