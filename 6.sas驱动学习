@@ -26,6 +26,8 @@ deu_mgt_get_notify_from_driver  sas模块和deu模块的接口
 list_add_tail(&notify_events->list, &deumgt_p->notify_queue);
 增加事件
 
+
+怎么看enclosure logical id(0x548ea001a223403f),这些sas地址是属于控制器的还是sas盘的
 notify_process_events处理如下上报的事件
 {
     enum notify_type
@@ -478,19 +480,26 @@ Jan 10 17:02:54 localhost-0 kernel: security is disable
 Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0: _scsih_sas_device_add: handle(0x000b), sas_addr(0x548ea634bd4c0001)
 *1E）Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0: enclosure logical id(0x548ea001a223403f), slot(3)
 Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0: enclosure level(0x0000),connector name(     )
+*1F）Jan 10 17:02:54 localhost-0 kernel: mpt3sas parphy_id = 0 attached_handle =9 remote_sas_address:0x548ea001a223403f
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas parphy_id = 0 *sas_port_id=0
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas LSI_SAS adapter cnt:1
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas 3008adapter No:1
+*1G）Jan 10 17:02:54 localhost-0 kernel: [DISK_DEU_INFO] Exp Event:Insert disk,type:SAS,Adaptor:1,Channel:0,Slot:3,parent_sas:0x548ea001a223403f,attach_sas:0x548ea634bd4c0001
+Jan 10 17:02:54 localhost-0 kernel: scsi 7:0:15:0: Direct-Access     ATA      ST3000VX002-1F41 CV13 PQ: 0 ANSI: 5
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:54 localhost-0 kernel: scsi 7:0:15:0: SSP: handle(0x000b), sas_addr(0x548ea634bd4c0001), phy(3), device_name(0x0000000000000000)
+Jan 10 17:02:54 localhost-0 kernel: scsi 7:0:15:0: enclosure logical id(0x548ea001a223403f), slot(3)
+Jan 10 17:02:54 localhost-0 kernel: scsi 7:0:15:0: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:54 localhost-0 kernel: scsi 7:0:15:0: serial_number(            Z3046599)
+Jan 10 17:02:54 localhost-0 kernel: scsi 7:0:15:0: Attached scsi generic sg1 type 0
+Jan 10 17:02:54 localhost-0 kernel: [759944]: scst: scst_register_device:1097:Attached to scsi7, channel 0, id 15, lun 0, type 0
 Jan 10 17:02:54 localhost-0 kernel: mpt3sas parphy_id = 0 attached_handle =9 remote_sas_address:0x548ea001a223403f
-
-
-
-
-
-
-
-
-
-
-
-
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas parphy_id = 0 *sas_port_id=0
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas LSI_SAS adapter cnt:1
+*1H）Jan 10 17:02:54 localhost-0 kernel: mpt3sas 3008adapter No:1
+*1I）Jan 10 17:02:54 localhost-0 kernel: [DISK_DEU_INFO] receive driver notify, id:2, parent_sas:0x548ea001a223403f, attach_sas:0x548ea634bd4c0001
+Jan 10 17:02:54 localhost-0 kernel: [DISK_DEU_INFO] Exp Event:Insert disk,type:SAS,ACSL[7:0:15:0],Adaptor:1,Channel:0,Slot:3,parent_sas:0x548ea001a223403f,attach_sas:0x548ea634bd4c0001
 
 cli上电流程
 {
@@ -513,5 +522,12 @@ cli上电流程
     poll_edge_log deu的日志轮询
 *1D）    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_check_disable_security->_scsih_ata16_identify
 *1E）  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->_scsih_display_enclosure_chassis_info
-_mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->_lsi_vx3000E_sasdrv_port_get
+*1F）_mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->_lsi_vx3000E_sasdrv_port_get（获取磁盘所在的SAS端口号）
+  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->lsi_3008adapter_num_get
+  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->deu_mgt_get_notify_from_driver
+*1G） disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify
+  scsi内核打印日志
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_report_luns->_scsih_determine_disposition
+*1H）  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->lsi_3008adapter_num_get
+*1I) _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->deu_mgt_get_notify_from_driver
 }
