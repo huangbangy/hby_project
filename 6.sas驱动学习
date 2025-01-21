@@ -500,6 +500,55 @@ Jan 10 17:02:54 localhost-0 kernel: mpt3sas LSI_SAS adapter cnt:1
 *1H）Jan 10 17:02:54 localhost-0 kernel: mpt3sas 3008adapter No:1
 *1I）Jan 10 17:02:54 localhost-0 kernel: [DISK_DEU_INFO] receive driver notify, id:2, parent_sas:0x548ea001a223403f, attach_sas:0x548ea634bd4c0001
 Jan 10 17:02:54 localhost-0 kernel: [DISK_DEU_INFO] Exp Event:Insert disk,type:SAS,ACSL[7:0:15:0],Adaptor:1,Channel:0,Slot:3,parent_sas:0x548ea001a223403f,attach_sas:0x548ea634bd4c0001
+Jan 10 17:02:54 localhost-0 kernel: sd 7:0:15:0: [sdb] 5860533168 512-byte logical blocks: (3.00 TB/2.73 TiB)
+Jan 10 17:02:54 localhost-0 kernel: sd 7:0:15:0: [sdb] 4096-byte physical blocks
+Jan 10 17:02:54 localhost-0 kernel: sd 7:0:15:0: [sdb] Write Protect is off
+*1J)Jan 10 17:02:54 localhost-0 kernel: [DISK_PD_CMD_INFO] Disk set port ready led meaning
+*1K)Jan 10 17:02:54 localhost-0 kernel: [DISK_PD_CMD_INFO] Disk set cache rcache:enable,wcache:disable, ACSL[7:0:15:0], ret:0
+*1L)Jan 10 17:02:54 localhost-0 kernel: [DISK_DEU_INFO] drv notify add disk,ACSL[7:0:15:0],LOC:[1,0,0,3]
+Jan 10 17:02:54 localhost-0 kernel: [DISK_PD_CMD_INFO] set loc[1,0,0,3],led status:Normal
+Jan 10 17:02:54 localhost-0 kernel: sd 7:0:15:0: [sdb] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+Jan 10 17:02:54 localhost-0 kernel: sd 7:0:15:0: [sdb] Attached SCSI disk
+Jan 10 17:02:55 localhost-0 kernel: [DISK_PD_CMD_INFO] set loc[1,0,0,3],led status:Normal
+Jan 10 17:02:55 localhost-0 kernel: [DISK_COMM_INFO] disk loc[1,0,0,3],sync led set success
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Begin to handle disk add messege:SATA disk with SCSI device:[7:0:15:0]. Location:[1,0,0,3],
+*1M)Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Wcache has disabled. disk with SCSI device:[7:0:15:0]. Location:[1,0,0,3], queue_flags:20d24494
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Does not found the PD by sn [Z3046599].
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Disk in scsi_id[7, 0, 15, 0] open device 8:16
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Read vender of PD[-1,Z3046599,5860533168,{1,0,0,3}].
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] PD[-1,Z3046599,5860533168,{1,0,0,3}]
+Jan 10 17:02:58 localhost-0 kernel: [PD_INFO] The pd version set to V2.  Location:[1,0,0,3], SN:Z3046599, ID:-1
+*1N)Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Add v2 pd into map. Location:[1,0,0,3], SN:Z3046599, ID:0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] disk_err_p is null
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] smart Enabled/Disabled  Status:Enabled
+*1O)Jan 10 17:02:58 localhost-0 kernel: cfs_enable value:0x13385
+Jan 10 17:02:58 localhost-0 kernel: cfs value:0x73
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_CMD_INFO] set loc[1,0,0,3],led status:Normal
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] handle SATA disk add messege success set default led,LOC:[1,0,0,3]
+Jan 10 17:02:58 localhost-0 kernel: [DISK_FSM_INFO] fsm(pd_fsm{7,0,15,0}): state Initializing event Add disk
+*1P)Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] SATA Disk associated with SCSI device:[7:0:15:0].  Location:[1,0,0,3], SN:Z3046599, ID:0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_CHECK_INFO] get disk error message is null.
+Jan 10 17:02:58 localhost-0 kernel: Storage::1736499778::I::DISK::2025/01/10::17:02:58::0x1054501::Disk{1,0,0,3} inserted
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] Header signature is invalid. Except: 11111111, Actual: 0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] ddf is invalid!
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] <DDF---HEADER>  signature: 0x0; crc: 0x0; lun_section_state: 0x0; sequence num: 0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] <DDF---RG>signature: 0x0;crc: 0x0;raid_group_uuid: 0-0-0-0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] raid_group_name: ; raid_type: 0x0;full_disk_num: 0x0 spare_disk_num: 0x0 ;capacity: 0x0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] <DDF---PD>signature: 0x0; crc: 0x0 ;in_raid_group:0x0; max_disk_num:0x0 ;current_disk_num:0x0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] disk_sn: ; disk_type: 0x0,disk_index: (0x0) swap_disk_idx:(0x0) disk_state:(0x0)  usable_size: (0x0)
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] dds_scan_read slow disk switch:1, pd->__serial_no:Z3046599
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] Header signature is invalid. Except: 11111111, Actual: 0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] ddf is invalid!
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] dds_scan_read slow disk switch:1, pd->__serial_no:Z3046599
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] Pri and sec ddf are both ni_err. pd sn: Z3046599
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Set pd role, old role:N/A, new role:Vacant, loc:{1,0,0,3},pd:Z3046599.
+*1Q）Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_ERR] pd[1,0,0,3] dds_node need_delete!
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] pd [1,0,0,3] has been finish dds scan, but need delete dds_node
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] pd[1,0,0,3] dds_node delete finish!
+*1R）Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] scsi qw process scsi add msg
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_CMD_INFO] set loc[1,0,0,3],led status:Normal
+Jan 10 17:02:58 localhost-0 kernel: [DISK_COMM_INFO] disk loc[1,0,0,3],sync led set success
+Jan 10 17:02:58 localhost-0 kernel: [DISK_COMM_INFO] receive power sleep timer install msg
 
 cli上电流程
 {
@@ -530,4 +579,29 @@ cli上电流程
     _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_report_luns->_scsih_determine_disposition
 *1H）  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->lsi_3008adapter_num_get
 *1I) _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->deu_mgt_get_notify_from_driver
+*1J)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_set_ready_led_meaning(SCSI 命令设置或清除 SCSI 设备的端口就绪 LED 的含义)
+*1K)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_set_cache->disk_set_sas_cache
+*1L)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_queue_work->disk_delay_work->disk_set_led
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_queue_work->disk_delay_work
+disk_init->disk_comm_init->disk_msg_requestproc->disk_msg_set_led
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata
+*1M)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->disk_wait_wcache_close
+pdi_get_by_sn
+pdi_new->pdi_open
+pdi_new->pdi_ddf_read_vendor
+*1N)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->common_pd_scan_anchor_and_to_map
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->sata_smart_enable(打开磁盘的smart信息查询)
+*1O)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->disk_get_cache->disk_get_sata_cache(获取磁盘读写cache的状态)
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->disk_set_led->disk_set_led_local
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata
+*1P)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->diskscan_pd_insert
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata(storage日志显示插入磁盘)
+*1Q）dds_node_delete
+dds_node_unlock_after_disk_scan
+dds_node_delete
+*1R）pd_scsi_queue_proc
+disk_init->disk_comm_init->disk_msg_requestproc->disk_msg_power_sleep_timer_install
 }
