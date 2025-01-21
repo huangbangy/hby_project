@@ -1,0 +1,51 @@
+将 SCSI 主机添加到 sysfs 是一个重要的步骤，因为它允许用户通过文件系统接口查看和管理 SCSI 主机的信息。
+sysfs 是一个虚拟文件系统，提供了一种结构化的方式来访问内核对象及其属性。以下是如何在系统中查看 SCSI 主机在 sysfs 中的表示。
+
+我们是mpt2sas对应2008，3sas对应3008，35sas对应3408和3808
+
+4个phy组成一个宽端口
+
+{0，0，0，0}由四部分组成
+disk_loc.adapter disk_loc.port disk_loc.enclosure disk_loc.slot
+
+struct disk_location {
+    u32 adapter;    // 适配器编号
+    u32 port;       // 端口号
+    u32 enclosure;  // 扩展柜编号
+    u32 slot;       // 插槽编号
+};
+
+下发上下电是disk下发的，且给deu方式的下发是下发ses page页的方式下发的
+
+驱动层通过接口通知disk层发生事件，如下电等操作
+
+lsscsi列出所有的scsi设备
+
+deu_mgt_get_notify_from_driver  sas模块和deu模块的接口
+
+list_add_tail(&notify_events->list, &deumgt_p->notify_queue);
+增加事件
+
+
+怎么看enclosure logical id(0x548ea001a223403f),这些sas地址是属于控制器的还是sas盘的
+notify_process_events处理如下上报的事件
+{
+    enum notify_type
+{
+  DEU_INS_SMP,
+  DEU_INS_SES,
+  DEU_INS_DISK,
+  DEU_DEL_SMP,
+  DEU_DEL_SES,
+  DEU_DEL_DISK,
+  DEU_POWEROFFON_DISK,
+  DEU_POWEROFF_DISK,
+  DEU_POWEROFF_FAULT_DISK,   //SAD36775
+  DEU_INS_NVME,
+  DEU_DEL_NVME,
+  MAX_NOTIFY,
+}
+
+_scsi_add_device 函数负责向系统中添加 SAS 设备，包括读取设备配置页、检查设备状态、处理特定产品需求、
+初始化设备结构体以及将设备添加到系统中。通过详细的步骤和错误处理机制，确保设备能够正确地被识别和管理。
+比如上下电五次不成功就给它下电点黄灯
