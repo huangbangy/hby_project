@@ -1,0 +1,46 @@
+信号量：
+加锁操作（P 操作）
+int32_t sem_lock(key_t key)
+{
+    int32_t sem_id;
+    struct sembuf sem_b;
+
+    sem_id = semget((key_t)key, 1, 0666);
+    if (sem_id == -1) {
+        syslog(LOG_ERR, "semget failed for key %x, error: %m", key);
+        return ENV_ERROR;
+    }
+
+    sem_b.sem_num = 0;  // 操作信号量集中的第一个信号量
+    sem_b.sem_op = -1;  // P操作，减少信号量的值
+    sem_b.sem_flg = SEM_UNDO;  // 确保进程终止时自动释放信号量
+
+    if (semop(sem_id, &sem_b, 1) == -1) {
+        syslog(LOG_ERR, "semop failed for key %x, error: %m", key);
+        return ENV_ERROR;
+    }
+
+    return ENV_OK;
+}   
+
+解锁操作（V 操作）
+int32_t sem_unlock(key_t key)
+{
+    int32_t sem_id;
+    struct sembuf sem_b;
+
+    sem_id = semget((key_t)key, 1, 0666);
+    if (sem_id == -1) {
+        syslog(LOG_ERR, "semget failed for key %x, error: %m", key);
+        return ENV_ERROR;
+    sem_b.sem_num = 0;  // 操作信号量集中的第一个信号量
+    sem_b.sem_op = 1;   // V操作，增加信号量的值
+    sem_b.sem_flg = SEM_UNDO;  // 确保进程终止时自动释放信号量 
+    
+    if (semop(sem_id, &sem_b, 1) == -1) {
+        syslog(LOG_ERR, "semop failed for key %x, error: %m", key);
+        return ENV_ERROR;
+    }
+
+    return ENV_OK;
+} 
