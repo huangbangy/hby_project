@@ -737,3 +737,31 @@ AA87003 【CX5024V2 装备】UCS2.0 环境下装备脚本执行异常，请分析
 项目任务：
 
 其他：121版本验证内存检测报告 ：\\10.220.8.26\teamroom\P2软件部\0.驱动组\验证报告\版本验证报告\V200R002B08D121版本_驱动组
+
+===================================================================
+一、产线局点：无
+
+二：问题单：
+审核
+AA90757 【CX1800 V200R002 海光010版本BIOS】海光010版本的BIOS提单跟踪合入主线版本；（审核）
+AA93841 【D121】诊断日志需要收集I225的FW版本 （审核）
+AA94571 【D121 内存槽位检测】CX5024-E-V2-H设备内存条都安装于离cpu的最外侧槽位，日志仍告警内存条安装不正确（审核）
+AA41038 【驱动】CX3048V2的plx8624 eeprom写入值异常问题记录，请增加规避方法（审核）
+AA62005 【D118 主机名】开启ftp服务并重启设备，日志打印主机名不对
+修改定位：
+AA87141 Jmicron背板NI05BK48SA背板名显示错误
+AA87148 适配1848V3搭配同jmicron NI05BK48SA背板情况ENVmonitor
+AA90360 【CX1800 V300R002 B01 逻辑】NI05MB116S01005需要合入ISO
+
+三、重点任务：无
+
+四、项目任务：
+CX18-H Monitor初步代码编写ok
+
+五、其它：
+测试问题定位：
+定位 jiweiqiang 不保存配置升级打印i2cko mv失败
+原因：ucs 制作iso脚本makeiso中区别与ipsan制作iso脚本多注释了mv i2c-designware-core.ko操作
+#mv $1/usr/lib/modules/${kernel_version}/kernel/drivers/i2c/busses/i2c-designware-core.ko $1/usr/lib/modules/${kernel_version}/kernel/drivers/i2c/busses/i2c-designware-core.ko.bak
+定位王鑫C slot_GE3 设置100M monitor不打印不告警，设置eth0正常
+继续定位
