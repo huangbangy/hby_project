@@ -765,3 +765,28 @@ CX18-H Monitor初步代码编写ok
 #mv $1/usr/lib/modules/${kernel_version}/kernel/drivers/i2c/busses/i2c-designware-core.ko $1/usr/lib/modules/${kernel_version}/kernel/drivers/i2c/busses/i2c-designware-core.ko.bak
 定位王鑫C slot_GE3 设置100M monitor不打印不告警，设置eth0正常
 继续定位
+
+======================================================
+2025.2.17-2025.2.21
+一、产线局点：提供电池检测取消最大容量截至限制的脚本
+
+二：问题单：
+审核
+AA91166 【D120 VX16-C-V3】set_netrecovery设置聚合口升级，重启进入小系统后arp表为空 跨网段ping不通
+AA92940 ARM的cli界面解除聚合端口时会打印 Connection 'System eth1' successfully deactivated 提示
+AA95789 【沧州移动公司】丢失一个I225网口导致igc驱动加载异常
+修改定位：
+AA94788 【D121 电池混插告警】电池混插告警正常，消除告警及再次告警时未打印相关日志
+AA79242 【VX1600V300R001B01软件 其他问题】VX1648-V3设备使用 stress 脚本加压时出现异常重启情况
+AA92303 【D121 ENVmonitor】请增加ENVmonitor -s -sys_space_threshold命令设置系统空间使用率告警阈值，方便测试
+
+三、重点任务：无
+
+四、项目任务：
+CX18-H Monitor初步代码编写ok
+
+五、其它：
+测试问题定位：
+定位yuyani 诊断日志V3设备打印VX1600问题，为正常日志，单控为VX1600,双控为VX3000，不区分V1 V2 V3
+
+协助测试luoqijuan完成海光测试FC卡相关任务
