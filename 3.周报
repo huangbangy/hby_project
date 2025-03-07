@@ -815,3 +815,30 @@ AA92303 ¡¾D121 ENVmonitor¡¿ÇëÔö¼ÓENVmonitor -s -sys_space_thresholdÃüÁîÉèÖÃÏµÍ³¿
 ÆäÉè±¸¿â×öÁË±¸·Ý²Ù×÷£¬µ¼ÖÂMonitorÁ´½ÓµÄ¿â²»ÊÇlibenv3.so ,¶øÊÇlibenv.so
 
 Ìá¹©liusuqianÑéÖ¤AA70839»·¾³
+
+======================================================
+2025.3.3-2025.3.7
+Ò»¡¢²úÏß¾Öµã£º
+1£©¶¨Î»6048V2¿ìËÙ¸ÄÖÆ²âÊÔ²»Í¨¹ýÎÊÌâ£¬ÒÑ¶¨Î»Çå³þÔ­Òò£¬Ä¿Ç°ÐÞ¸Ä³ÌÐòÑéÖ¤ok£¬ÏÂÒ»²½²úÏß¼Æ»®´ýºÍchenyan¹µÍ¨£¨Ô¤¼ÆÔÚ122P01½â¾ö£©
+
+¶þ£ºÎÊÌâµ¥£º
+ÉóºË
+AA97505 ¡¾D121 arm¡¿ÔÚarm·þÎñÆ÷µÄipsan½çÃæµã»÷ÖØÆôÍøÂç°´Å¥ÌáÊ¾Ê§°Ü£¬ÏÂ·¢µÄÃüÁîÊÇbinsystemctl restart network.service£¬ÐèÐÞ¸Ä
+ÐÞ¸Ä¶¨Î»£º
+AA94788 ¡¾D121 µç³Ø»ì²å¸æ¾¯¡¿µç³Ø»ì²å¸æ¾¯Õý³££¬Ïû³ý¸æ¾¯¼°ÔÙ´Î¸æ¾¯Ê±Î´´òÓ¡Ïà¹ØÈÕÖ¾
+AA85436 ¡¾D120 Íø¿Ú¸æ¾¯¡¿ÊÖ¶¯ÉèÖÃÍø¿ÚÐ­ÉÌ°ÙÕ×£¬ÓÐ¸ÅÂÊ³öÏÖÉè±¸Ã»ÓÐµãÁÁ¸æ¾¯µÆºÍÊÂ¼þÈÕÖ¾ÉÏ±¨µÄÏÖÏó
+
+Èý¡¢ÖØµãÈÎÎñ£ºÎÞ
+
+ËÄ¡¢ÏîÄ¿ÈÎÎñ£º
+ÎÞ
+
+Îå¡¢ÆäËü£º
+¶¨Î»lvtingµç³Ø¸æ¾¯Òì³£Ô­Òò£¬ÒòµÚÒ»´Îµç³Ø¼ì²âÎ´Íê±Ï£¬ËùÒÔ²åÈëµÚ¶þ¿éµç³Ø»áÁ¢¼´¼ì²â
+
+¶¨Î»lvting ·çÉÈ¸æ¾¯ÓëÎÂ¶È²»Æ¥ÅäÔ­Òò£¬¶ÁÈ¡ÈÕÖ¾Èí¼þÎÞÎÊÌâ£¬´óÖÂÎªÂß¼­ÎÊÌâ£¬ÒÑ½»wuyongqiang¶¨Î»
+
+¶¨Î»wanwanrongË«¿ØÉè±¸ÓÐÒ»¶Ë·ÃÎÊeepromÊ§°ÜÔ­Òò£¬ä¯ÀÀ´úÂë£¬¶¨Î»Îª·ÇÇ¿ÖÆ·ÃÎÊÊ§°Ü£¨¶Ô¶Ë¿ÉÄÜÕ¼ÓÃ£©£¬µ«¿´ÈÕÖ¾
+¶Ô¶ËÍ¬Ê±¼ä¶ÎÃ»ÓÐ·ÃÎÊÏà¹Ø²Ù×÷£¬ÓÃ ha_eeprom_debug -test -access_time ²âÊÔeeprom·ÃÎÊ£¬µÚÒ»´ÎÊ§°Ü£¬Ä¿Ç°ÓëÓ²¼þ¼ÌÐø¶¨Î»
+
+¶¨Î»cuihonbo ÉèÖÃÍø¿Ú100M²»¸æ¾¯Ô­Òò£¬DM×é¼þÓ°ÏìifconfigÅÐ¶Ï£¬ÒÑÌáµ¥
