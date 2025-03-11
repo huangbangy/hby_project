@@ -1,0 +1,55 @@
+cli上电流程
+{
+    判断deu类型
+    sas deu类型的下发page页
+    poll_edge_log deu的日志轮询
+    _mpt3sas_fw_work->_scsih_sas_discovery_event 发现事件发现磁盘
+    _mpt3sas_fw_work->_scsih_sas_discovery_event->_scsih_sas_host_add（磁盘上线为0的时候给它执行这个函数分配的，中途上电不走此分支）
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
+*1A）    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device (包括磁盘未准备就绪时我司做的上下电处理_lsi_sasdrv_dev_poweroffon)
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_start_unit
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_report_luns->_scsih_determine_disposition(解析 ioc_status 和 scsi_state: 根据这些字段确定设备的状态和处理建议,retry四次，ready时退出)
+*1B）  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug （SAS 扩展器设备的句柄（handle），SAS 扩展器设备的机箱（enclosure）的句柄，拓扑变化开始的物理端口编号，拓扑变化涉及的物理端口数量）
+*1C） _mpt3sas_fw_work->_scsih_sas_discovery_event->_scsih_sas_discovery_event 发现事件发现磁盘
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug(句柄,速率 )
+    poll_edge_log deu的日志轮询
+*1D）    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_check_disable_security->_scsih_ata16_identify
+*1E）  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->_scsih_display_enclosure_chassis_info
+*1F）_mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->_lsi_vx3000E_sasdrv_port_get（获取磁盘所在的SAS端口号）
+  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->lsi_3008adapter_num_get
+  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->deu_mgt_get_notify_from_driver
+*1G） disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify
+  scsi内核打印日志
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_report_luns->_scsih_determine_disposition
+*1H）  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->lsi_3008adapter_num_get
+*1I) _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->deu_mgt_get_notify_from_driver
+*1J)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_set_ready_led_meaning(SCSI 命令设置或清除 SCSI 设备的端口就绪 LED 的含义)
+*1K)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_set_cache->disk_set_sas_cache
+*1L)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_queue_work->disk_delay_work->disk_set_led
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_queue_work->disk_delay_work
+disk_init->disk_comm_init->disk_msg_requestproc->disk_msg_set_led
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata
+*1M)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->disk_wait_wcache_close
+pdi_get_by_sn
+pdi_new->pdi_open
+pdi_new->pdi_ddf_read_vendor
+*1N)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->common_pd_scan_anchor_and_to_map
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->sata_smart_enable(打开磁盘的smart信息查询)
+*1O)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->disk_get_cache->disk_get_sata_cache(获取磁盘读写cache的状态)
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->disk_set_led->disk_set_led_local
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata
+*1P)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->diskscan_pd_insert
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata(storage日志显示插入磁盘)
+*1Q）dds_node_delete
+dds_node_unlock_after_disk_scan
+dds_node_delete
+*1R）pd_scsi_queue_proc
+disk_init->disk_comm_init->disk_msg_requestproc->disk_msg_power_sleep_timer_install
+}

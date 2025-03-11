@@ -1,0 +1,6 @@
+	printk(MPT3SAS_INFO_FMT "host_add: handle(0x%04x), "
+	    "sas_addr(0x%016llx), phys(%d)\n", ioc->name, ioc->sas_hba.handle,
+	    (unsigned long long) ioc->sas_hba.sas_address,
+	    ioc->sas_hba.num_phys);
+
+这里的num的数目是怎么出来的，与连接的磁盘是否有关        
