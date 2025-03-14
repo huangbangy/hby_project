@@ -842,3 +842,35 @@ AA85436 ¡¾D120 Íø¿Ú¸æ¾¯¡¿ÊÖ¶¯ÉèÖÃÍø¿ÚÐ­ÉÌ°ÙÕ×£¬ÓÐ¸ÅÂÊ³öÏÖÉè±¸Ã»ÓÐµãÁÁ¸æ¾¯µÆºÍÊÂ¼
 ¶Ô¶ËÍ¬Ê±¼ä¶ÎÃ»ÓÐ·ÃÎÊÏà¹Ø²Ù×÷£¬ÓÃ ha_eeprom_debug -test -access_time ²âÊÔeeprom·ÃÎÊ£¬µÚÒ»´ÎÊ§°Ü£¬Ä¿Ç°ÓëÓ²¼þ¼ÌÐø¶¨Î»
 
 ¶¨Î»cuihonbo ÉèÖÃÍø¿Ú100M²»¸æ¾¯Ô­Òò£¬DM×é¼þÓ°ÏìifconfigÅÐ¶Ï£¬ÒÑÌáµ¥
+
+
+======================================================
+2025.3.10 -20253.14
+Ò»¡¢²úÏß¾Öµã£º
+1£©ÎÞ
+
+¶þ£ºÎÊÌâµ¥£º
+ÉóºË
+ SAD35216 Éý¼¶Ð¡ÏµÍ³ÊÊÅäipv6Éý¼¶
+ÐÞ¸Ä¶¨Î»£º
+AB03325 ¡¾D119 ÏµÍ³¿¨RAID1¡¿ÇëÆÀÉóÊÇ·ñ½«ÏµÍ³¿¨raid½µ¼¶µÄÐÅÏ¢ÊµÏÖ³ÉÊÂ¼þÈÕÖ¾´òÓ¡²¢ÉÏ±¨¸æ¾¯£¨ÒÑ·ÖÎöÇå³þÐÞ¸ÄÐèÇó£¬ÐèÒªºÍzhenxuanÒ»ÆðÊµÏÖ£©
+AB03020 ¡¾D122 48ÅÌÎ»¡¿Çë48ÅÌÎ»Ö§³ÖENVmonitor -s -uart2 -SAs3x36_1ÃüÁîÊ¹ÓÃ
+AA94788 ¡¾D121 µç³Ø»ì²å¸æ¾¯¡¿µç³Ø»ì²å¸æ¾¯Õý³££¬Ïû³ý¸æ¾¯¼°ÔÙ´Î¸æ¾¯Ê±Î´´òÓ¡Ïà¹ØÈÕÖ¾£¨ÒÑÓëliusuqian¹µÍ¨Çå³þÐèÒªÍ¬²½ÐÞ¸Ä£©
+
+Èý¡¢ÖØµãÈÎÎñ£ºÎÞ
+
+ËÄ¡¢ÏîÄ¿ÈÎÎñ£º
+ÎÞ
+
+Îå¡¢ÆäËü£º
+Ìá¹©-GÉè±¸¸øIPSAN×é
+Êï¹â·þÎñÆ÷Éý¼¶SDSok
+·ÉÌÚ·þÎñÆ÷Éý¼¶sdsÒòÊÇubootÆô¶¯£¬Ä¿Ç°ÔÝÊ±Éý¼¶²»ok£¬ÓëÔ­³§¹µÍ¨Ñ°Çó½â¾ö°ì·¨ÖÐ
+¶¨Î»ÁËliupeng ÈÝÁ¿¼ì²â½Å±¾Îª4000ma²»ÕýÈ·Ô­Òò£¬ºÍ×î³õÓ²¼þ¸øµÄ²ÎÊý»òÕß·ÅµçËÙ¶È²»×¼È·ÓÐ¹Ø£¬Ä¿Ç°Í¬Ó²¼þÒ»Æð·ÖÎöÖÐ
+
+Áù¡¢ÏÂÖÜ¼Æ»®
+½â¾öÑéÖ¤ÎÊÌâµ¥
+AA94788 ¡¾D121 µç³Ø»ì²å¸æ¾¯¡¿µç³Ø»ì²å¸æ¾¯Õý³££¬Ïû³ý¸æ¾¯¼°ÔÙ´Î¸æ¾¯Ê±Î´´òÓ¡Ïà¹ØÈÕÖ¾
+AB03325 ¡¾D119 ÏµÍ³¿¨RAID1¡¿ÇëÆÀÉóÊÇ·ñ½«ÏµÍ³¿¨raid½µ¼¶µÄÐÅÏ¢ÊµÏÖ³ÉÊÂ¼þÈÕÖ¾´òÓ¡²¢ÉÏ±¨¸æ¾¯
+
+¼ÌÐø´¦ÀíÈçºÎubootÒýµ¼ÎÒË¾ÏµÍ³
