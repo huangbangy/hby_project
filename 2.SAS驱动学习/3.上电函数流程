@@ -7,7 +7,7 @@ cli上电流程
     _mpt3sas_fw_work->_scsih_sas_discovery_event->_scsih_sas_host_add（磁盘上线为0的时候给它执行这个函数分配的，中途上电不走此分支）
     _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
     _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
-*1A）    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device (包括磁盘未准备就绪时我司做的上下电处理_lsi_sasdrv_dev_poweroffon)
+*1A）    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_add_device (包括磁盘未准备就绪时我司做的上下电处理_lsi_sasdrv_dev_poweroffon)
     _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_start_unit
     _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_report_luns->_scsih_determine_disposition(解析 ioc_status 和 scsi_state: 根据这些字段确定设备的状态和处理建议,retry四次，ready时退出)
 *1B）  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device
@@ -26,7 +26,8 @@ cli上电流程
   scsi内核打印日志
     _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_report_luns->_scsih_determine_disposition
 *1H）  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->lsi_3008adapter_num_get
-*1I) _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->deu_mgt_get_notify_from_driver
+*1I) _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->deu_mgt_get_notify_from_driver 驱动通知磁盘事件接口,驱动调用
+ disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify
 *1J)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_set_ready_led_meaning(SCSI 命令设置或清除 SCSI 设备的端口就绪 LED 的含义)
 *1K)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_set_cache->disk_set_sas_cache
 *1L)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk

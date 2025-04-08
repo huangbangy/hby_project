@@ -12,3 +12,23 @@ Mar 11 08:01:49 loca
 enclosure_handle(0x0001 为什么有的是00001有的是0002
 
 EnclosureHandle 和ExpanderDevHandle 的区别
+
+ ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready
+
+
+SMP SES是什么
+ enum notify_type
+{
+  DEU_INS_SMP,
+  DEU_INS_SES,
+  DEU_INS_DISK,
+  DEU_DEL_SMP,
+  DEU_DEL_SES,
+  DEU_DEL_DISK,
+  DEU_POWEROFFON_DISK,
+  DEU_POWEROFF_DISK,
+  DEU_POWEROFF_FAULT_DISK,   //SAD36775
+  DEU_INS_NVME,
+  DEU_DEL_NVME,
+  MAX_NOTI
+
