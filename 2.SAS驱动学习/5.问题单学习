@@ -1,0 +1,12 @@
+SAD36775 【请CCB对于驱动加盘失败的磁盘未上报dick层处理，磁盘灯还是绿色常亮，这种情况的处理策略】
+
+SAD30827 【D075.42】CX3060两个控制执行poweroff时，出现上控制器切kdump空指针重启mpt3sas_base_clear_st+0x32/0x50，再开机下控制打印内核堆栈kernel/workqueue.c:2439 check_flush_dependencyscsih_shutdown(struct pci_dev *pdev)
+========================================
+scsih_shutdown(struct pci_dev *pdev)
+
+mpt3sas_wait_for_commands_to_complete(ioc); 修改成	mpt3sas_scsih_flush_running_cmds(ioc);
+
+
+
+=========================================
+
