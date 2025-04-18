@@ -9,4 +9,14 @@ mpt3sas_wait_for_commands_to_complete(ioc); 修改成	mpt3sas_scsih_flush_running_c
 
 
 =========================================
+SAD33083 【D075.60 坏盘】在处理Broadcast Async Count错误类型的磁盘时，环境中正常的磁盘也会下电上电
+没看懂，改了
+_scsih_check_device(struct MPT3SAS_ADAPTER *ioc,
+	u64 parent_sas_address, u16 handle, u8 phy_number, u8 link_rate)
+    
+=========================================
+SAD32570 【D075.55P04 CX3060-V2+DE3160-V2+DE1824-V2】60盘位主机级联了两款DEU，拔插DEU的sas线，下控端打堆栈
+----
+
+
 
