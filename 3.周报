@@ -1037,5 +1037,45 @@ AB15972【D095P09】需给存储网卡配置文件增加禁止VI修改说明 审核
 参加飞腾会议
 luoqijuan相关电池测试问题解答
 
+======================================================
+2025.4.21 -2025.4.25
+一、产局点：
+1） 无
+
+二：问题单：
+AB23199 【CX18V3-G ENVmonitor】适配CPU温度获取
+AB24023 【18V3-G】ENVmonitor适配iic
+AB23261 【18V3-G】适配bios在线升级
+AB18127 【D095P09】升级进入串口ping 命令无法中断 审核
+AB15467 【D095P09】NetworkManager模块需卸载 审核
+三、重点任务：无
+
+四、项目任务：
+国产化-G项目
+整体测试用例已过75%
+
+storservice启动无报错
+ENVmonitor 电池检测验证ok 温度读取ok 电压读取ok 电源验证ok 数码管验证ok 系统灯告警灯验证ok iic ok（已验证80%）
+掉电刷kdump验证ok
+重命名验证ok
+bios在线升级适配ok
+cpld在线升级适配ok
+U盘升级ok
+
+需适配
+disk部分zhenxuan需适配
+bios硬件功能未遍历完不能出bios正式版本（待出bios正式版本验证bios在线升级）
+
+下一步计划继续验证：
+磁盘拔插
+iometer打流
+
+
+五、其它：
+修改chenyan-H hasa所需提供4个子卡标配的脚本，已提供
+定位wangwangrong 95P09 温度告警恢复告警灯没恢复原因
+与wuyongqiang liujinheng沟通-G相关事宜
+
+
 
 
