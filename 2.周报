@@ -1209,3 +1209,32 @@ hp_config部分修改ok
 定位zhutinghui 海光centos版本升级欧拉报iic错误原因，为mv ko不成功导致，已提单
 协助硬件测试完成iic部分测试
 评审热拔插概要设计
+
+
+======================================================
+2025.6.23 -2025.6.27
+
+一、产线局点：
+无
+二、问题单：
+审核：
+AB35108 【CX5000装备脚本】en_equipment_CX5024和en_equipment_CX5048脚本合入欧拉系统未修改，导致装备中hostname获取不到
+AB40112 【D125】CX5048-E-V2-H设备执行en_equipment命令进入装备模式，存在usrbinen_equipment line 13 [ = unary operator expected异常报错
+AB31619 【1836-V3-G1848-V3-G】请给1836-V3-G1848-V3-G适配error_simulator.sh
+AB38970 【-G和-H】将-G和-H的修改，从分支IPSAN-R2201.120_CX1800V3R3同步到IPSAN-R2201.125P01_CX1800V300R003B04
+AB39197 【CX18-V3-G需求】同步 IPSAN-R2201.120_CX1800V3R3 分支修改到 IPSAN-R2201.125P01_CX1800V300R003B04（审核）
+修改定位：
+AB35910 【D125 升级】D095P10网络升级到D125，系统起来后报主板温度寄存器错误
+AB36159 【热插拔适配】适配热插拔升级配置文件
+AB38801 【18-G-V3】同步120分支18V3-G修改分支到125P01
+三、重点任务：
+1）125P01版本验证走单
+2）126版本走单验证
+3）热拔插适配动态pci_hotplug_io_size/ pci_hotplug_mmio_size/pci_hotplug_mmio_pref_size大小ok，正在做系统测试用例并完善测试用例
+
+四、其他：
+1）docker
+下周计划问题单号
+1）AB36159 【热插拔适配】适配热插拔升级配置文件
+2）AB28306 【ENVmonitor】i2c-designware-core.ko合入基础iso
+3）AB26844 【压缩服务器 D124】ax650_subcard23_temp没有进行高温关断
