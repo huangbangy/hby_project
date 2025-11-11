@@ -1748,3 +1748,14 @@ ioremap是Linux内核中用于建立IO内存映射的关键函数。它的主要作用是将设备的物理地址
 
 nm /usr/local/hstor/sms_install/usr/lib/libenv.so
 可以看出库里面包含函数
+
+“PCIe 设备的扩展配置空间”： PCIe 设备除了前 256 字节的标准配置空间，后面还有额外的“扩展配置空间”，总共可达 4096 字节。访问这个空间是配置和管理高级 PCIe 设备（如 SSD、万兆网卡）的基础。
+
+操作 I/O 端口
+在 Linux 设备驱动中，操作 I/O 端口通常遵循“申请-访问-释放”的步骤：
+
+申请端口：使用 request_region 函数向内核申请一段 I/O 端口区域。如果成功，该区域就会出现在 /proc/ioports 中。（存储设备中V3之前的采取request的方法，后面的采取bios预留的方法）
+
+访问端口：使用 inb、outb 等专用函数进行读写。
+
+释放端口：使用 release_region 函数释放不再使用的端口。
