@@ -1759,3 +1759,18 @@ nm /usr/local/hstor/sms_install/usr/lib/libenv.so
 访问端口：使用 inb、outb 等专用函数进行读写。
 
 释放端口：使用 release_region 函数释放不再使用的端口。
+
+如果需要模块运行时调整参数，使用 module_param。
+如果需要内核启动时传递平台参数，使用 __setup。
+
+内核模块默认不会被重复加载，除非使用 --force 强制操作。
+自动加载机制（如 udevd 和 modprobe）会避免重复加载。
+重复加载的风险通常来自配置错误或强制命令，可通过检查 lsmod 和 dmesg 验证模块状态。
+
+static int pesw_sda_hold_time = 1;
+module_param(pesw_sda_hold_time,int,S_IRUGO|S_IWUSR);
+MODULE_PARM_DESC(pesw_sda_hold_time, "pesw_sda_hold_time(default=1)");
+
+i2c-designware-core.conf
+
+options i2c-designware-core pesw_sda_hold_time=5
