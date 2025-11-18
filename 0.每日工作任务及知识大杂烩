@@ -1774,3 +1774,15 @@ MODULE_PARM_DESC(pesw_sda_hold_time, "pesw_sda_hold_time(default=1)");
 i2c-designware-core.conf
 
 options i2c-designware-core pesw_sda_hold_time=5
+
+t_{SU:STA}	Start Setup Time	起始条件前，SCL必须为高的最短时间。	SDA的下降沿	确保起始条件被可靠识别。
+t_{HD:STA}	Start Hold Time	起始条件后，SCL必须保持为低的最短时间。	SDA的下降沿	给从设备响应起始信号的时间。
+t_{SU:DAT}	Data Setup Time	SCL上升沿前，数据必须稳定的最短时间。	SCL的上升沿	核心：确保数据被可靠采样。
+t_{HD:DAT}	Data Hold Time	SCL下降沿后，数据必须保持稳定的最短时间。	SCL的下降沿	确保数据位完整结束。
+t_{SU:STO}	Stop Setup Time	停止条件前，SCL必须为高的最短时间。	SDA的上升沿	确保停止条件被可靠识别。
+
+如果主设备在SCL下降沿瞬间就改变SDA，这个快速的跳变可能会通过电路耦合或信号反射，影响到刚刚完成采样的从设备内部电路，尤其是在高总线电容或长走线的情况下。
+
+t_{HD:DAT} 的作用： 它提供了一个缓冲期，让从设备的采样电路在读取数据后能稳定下来，与总线上的任何后续变化隔离开来。
+
+硬件之前就是scl下降曲线和sda上升曲线快重合了，就会导致采样电路没有稳定下来
