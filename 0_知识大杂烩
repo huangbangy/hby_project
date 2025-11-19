@@ -759,9 +759,7 @@ fsck.ext4 -y /dev/md126p3. 非V3设备就是md126p2
 
 cat /proc/meminfo
 
-vds只用我们的硬件
 
-超融合用我们的系统
 
 openstack
 
@@ -981,6 +979,8 @@ i2c-designware-core.conf
 
 options i2c-designware-core pesw_sda_hold_time=5
 
+IIC相关：
+
 t_{SU:STA}	Start Setup Time	起始条件前，SCL必须为高的最短时间。	SDA的下降沿	确保起始条件被可靠识别。
 t_{HD:STA}	Start Hold Time	起始条件后，SCL必须保持为低的最短时间。	SDA的下降沿	给从设备响应起始信号的时间。
 t_{SU:DAT}	Data Setup Time	SCL上升沿前，数据必须稳定的最短时间。	SCL的上升沿	核心：确保数据被可靠采样。
@@ -1007,4 +1007,50 @@ SDA   _______████████``````````______________
 SCL   ─────────────└──┘──────────────────────
                   从设备在上升沿  主设备在下降沿
                   读到‘1’       立即改变SDA
+				  
 
+内核编译模块：
+make -C /usr/src/kernels/linux-5.4.20 M=/home/lichengjuan/kernel_make/linux-5.4.20/drivers/i2c modules
+
+make -C /usr/src/kernels/linux-5.10.0_hotplug M=/driver/h10235/kernel_make/kernel/drivers/i2c modules
+
+
+make -C /usr/src/kernels/linux-5.10.0 M=/driver/h10235/kernel_make/kernel/drivers/i2c/ modules
+　　"-C"：表示进入指定目录中
+
+　　PWD：获取当前所在路径
+
+　　SUBDIRS=$(PWD)：告诉内核源码到指定目录去编译内核程序
+
+　　clean：执行 make clean 时删除生成的目标文件
+
+du * -sh 看具体文件的大小
+
+make menuconfig 内核最后编译执行这个会出现一个界面
+
+iic工具：
+
+./i2cset -f -y 1 0x20 0x77 0x3f 给iic1挂载器件的0x77位器件偏移0x77 写0x3f这个数据
+./i2cget -f -y 1 0x20 0x77 数值是0x3f
+./i2cset -f -y 1 0x20 0x77 0x3f （设置i2c-1上0x20器件的0x77寄存器值为0x3f）
+
+./i2cdetect -r -y 0 扫描总线1上的设备
+
+./i2cdetect -F 0 查询总线0的功能
+
+./i2cdetect -l 检测当前系统有几组i2c总线
+
+设置i2c-1上0x20器件的0x77寄存器值为0x3f
+./i2cset -f -y 1 0x20 0x77 0x3f
+读取i2c-1上0x20器件的0x77寄存器值
+./i2cget -f -y 1 0x20 0x77
+
+读取i2c1上0x38器件的所有寄存器
+./i2cdump -f -y -a 1 0x38
+
+查看系统上存在的 i2c 总线及其设备地址   ls /sys/bus/i2c/devices/
+
+
+查看系统上存在的 i2c 总线及其设备地址   ls /sys/bus/i2c/devices/
+
+修改syslog日志告警级别 vi  /etc/rsyslog.conf   ;service rsyslog restart
