@@ -1054,3 +1054,12 @@ iic工具：
 查看系统上存在的 i2c 总线及其设备地址   ls /sys/bus/i2c/devices/
 
 修改syslog日志告警级别 vi  /etc/rsyslog.conf   ;service rsyslog restart
+
+格式化文件系统：
+内核中的模块：ext4, xfs, vfat
+Linux的虚拟文件系统：VFS
+用户空间的管理工具：mkfs.ext4, mkfs.xfs,mkfs.vfat
+cat /proc/filesystems
+
+逻辑卷：动态智能管理空间
+当你听到"LVM"时，就想象那个可以随时调整大小的智能图书馆，是不是感觉清晰多了
