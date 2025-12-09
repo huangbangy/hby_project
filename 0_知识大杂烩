@@ -1124,3 +1124,11 @@ Linux API   | inb()/outb() 系列               | ioread()/iowrite() 系列
 关键数字：
 
 典型页大小：4KB（0x1000字节）
+
+pci桥分透明桥和非透明桥，非透明桥一般用于双处理器直接的数据交换
+
+cat /proc/iomem  # 显示所有内存映射的IO区域
+cat /proc/ioports  # 显示所有IO端口分配
+
+
+lspci -k 可以查看所有设备对应的驱动程序
