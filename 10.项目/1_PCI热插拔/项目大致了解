@@ -1,0 +1,5 @@
+允许用户通过sysfs接口手动触发PCI设备的重新扫描，类似于热插拔检测
+通过/sys/bus/pci/devices/[device_id]/rescan文件
+直接调用的内核
+I:\0_0H10235_Code\pci\pci-sysfs.c
+的dev_rescan_store 进行资源的重分配等
