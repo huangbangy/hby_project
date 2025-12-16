@@ -1067,6 +1067,13 @@ $ setpci -s 0a:00.0 A0.b=0x01
 临时测试或手动调试	使用 insmod 或 modprobe 在命令行直接指定	灵活快捷，但每次加载都需要重新输入命令。
 运行时临时修改	通过 sysfs 接口（如 echo value > /sys/module/module_name/parameters/param_name）	无需重新加载模块即可动态调整部分参数，但非持久化，重启后失效。
 
+cat i2c-designware-core.conf
+options i2c-designware-core pesw_sda_hold_time=5
+
+module_param(scu_disk_slot,int,S_IRUGO|S_IWUSR);
+MODULE_PARM_DESC(scu_disk_slot, "scu disk slot(default=-1)");
+cat /sys/module/sata_drv_interface/parameters/scu_disk_slot
+
 内核符号表的意义
 {
 	地址解析 让模块能找到内核函数的实际位置
