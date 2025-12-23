@@ -1139,3 +1139,22 @@ cat /proc/ioports  # 显示所有IO端口分配
 
 
 lspci -k 可以查看所有设备对应的驱动程序
+
+可用的内核参数在目录/proc/sys中
+vi /etc/sysctl.conf
+列
+#禁用包过滤功能
+net.ipv4.ip_forward = 0 
+
+[root@localhost ~]# lspci -n
+00:00.0 0600: 1d94:1450
+00:01.0 0600: 1d94:1452
+00:01.1 0604: 1d94:1453
+查看pci设备的厂商和设备id号
+lspci -nn
+[root@localhost ~]# lspci -nn
+00:00.0 Host bridge [0600]: Chengdu Haiguang IC Design Co., Ltd. Root Complex [1d94:1450]
+00:01.0 Host bridge [0600]: Chengdu Haiguang IC Design Co., Ltd. PCIe Dummy Host Bridge [1d94:1452]
+查看更具体的设备信息
+lspci -vvv -s 00:1f.4
+
