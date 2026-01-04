@@ -122,7 +122,9 @@
                                                                                                         "data": {
                                                                                                             "id": "dffl7q4thr40",
                                                                                                             "created": 1767507774645,
-                                                                                                            "text": "pci_scan_device"
+                                                                                                            "text": "pci_scan_device",
+                                                                                                            "note": "read me",
+                                                                                                            "expandState": "expand"
                                                                                                         },
                                                                                                         "children": [
                                                                                                             {
@@ -131,7 +133,25 @@
                                                                                                                     "created": 1767507802178,
                                                                                                                     "text": "pci_setup_device(pci 0000:00:00.0: [1d94:1450] type 00 class 0x060000)"
                                                                                                                 },
-                                                                                                                "children": []
+                                                                                                                "children": [
+                                                                                                                    {
+                                                                                                                        "data": {
+                                                                                                                            "id": "dffodbizb340",
+                                                                                                                            "created": 1767516676364,
+                                                                                                                            "text": "pci_read_bases"
+                                                                                                                        },
+                                                                                                                        "children": [
+                                                                                                                            {
+                                                                                                                                "data": {
+                                                                                                                                    "id": "dffods9noz40",
+                                                                                                                                    "created": 1767516712806,
+                                                                                                                                    "text": "__pci_read_base?pci_info(dev, \"HBY:reg 0x%x: %pR\n\", pos, res);?"
+                                                                                                                                },
+                                                                                                                                "children": []
+                                                                                                                            }
+                                                                                                                        ]
+                                                                                                                    }
+                                                                                                                ]
                                                                                                             }
                                                                                                         ]
                                                                                                     }
