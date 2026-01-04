@@ -1,0 +1,165 @@
+{
+    "root": {
+        "data": {
+            "id": "dfb6w2i5fmo0",
+            "created": 1767061125837,
+            "text": "acpi_init",
+            "priority": 1,
+            "font-family": "¿¬Ìå,¿¬Ìå_GB2312,SimKai"
+        },
+        "children": [
+            {
+                "data": {
+                    "id": "dfb73xxvhww0",
+                    "created": 1767061742817,
+                    "text": "acpi_scan_init",
+                    "layout": null
+                },
+                "children": [
+                    {
+                        "data": {
+                            "id": "dfbcagd671s0",
+                            "created": 1767076358659,
+                            "text": "acpi_bus_scan",
+                            "layout": null
+                        },
+                        "children": [
+                            {
+                                "data": {
+                                    "id": "dfbcbztc8mg0",
+                                    "created": 1767076479359,
+                                    "text": "acpi_bus_attach",
+                                    "layout": null
+                                },
+                                "children": [
+                                    {
+                                        "data": {
+                                            "id": "dfbccp69haw0",
+                                            "created": 1767076534560,
+                                            "text": "acpi_pci_root_add",
+                                            "layout": null
+                                        },
+                                        "children": [
+                                            {
+                                                "data": {
+                                                    "id": "dfbcshmpcjs0",
+                                                    "created": 1767077771967,
+                                                    "text": "pci_acpi_scan_root",
+                                                    "layout": null
+                                                },
+                                                "children": [
+                                                    {
+                                                        "data": {
+                                                            "id": "dfbct6dtxb40",
+                                                            "created": 1767077825850,
+                                                            "text": "acpi_pci_root_create(pci_root.c)",
+                                                            "layout": null
+                                                        },
+                                                        "children": [
+                                                            {
+                                                                "data": {
+                                                                    "id": "dfbcutqjl8w0",
+                                                                    "created": 1767077955049,
+                                                                    "text": "pci_create_root_bus(probe.c)",
+                                                                    "layout": null
+                                                                },
+                                                                "children": [
+                                                                    {
+                                                                        "data": {
+                                                                            "id": "dfbcw97n99s0",
+                                                                            "created": 1767078067099,
+                                                                            "text": "?pci_register_host_bridge(probe.c)?pci_bus 0000:00: root bus resource [io? 0x0000-0x02f7 window]",
+                                                                            "layout": null
+                                                                        },
+                                                                        "children": []
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "data": {
+                                                                    "id": "dfbeamyfq7s0",
+                                                                    "created": 1767082015225,
+                                                                    "text": "pci_scan_child_bus_extend"
+                                                                },
+                                                                "children": [
+                                                                    {
+                                                                        "data": {
+                                                                            "id": "dfbeec9jkmg0",
+                                                                            "created": 1767082305409,
+                                                                            "text": "pci_scan_bridge_extend"
+                                                                        },
+                                                                        "children": [
+                                                                            {
+                                                                                "data": {
+                                                                                    "id": "dfbeefa4rts0",
+                                                                                    "created": 1767082311975,
+                                                                                    "text": "pci_scan_child_bus_extend"
+                                                                                },
+                                                                                "children": [
+                                                                                    {
+                                                                                        "data": {
+                                                                                            "id": "dfbeegfmw800",
+                                                                                            "created": 1767082314484,
+                                                                                            "text": "pci_scan_slot"
+                                                                                        },
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "data": {
+                                                                                                    "id": "dfbeeht3nzs0",
+                                                                                                    "created": 1767082317475,
+                                                                                                    "text": "pci_scan_single_device"
+                                                                                                },
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "data": {
+                                                                                                            "id": "dfbef0tigfc0",
+                                                                                                            "created": 1767082358859,
+                                                                                                            "text": ""
+                                                                                                        },
+                                                                                                        "children": []
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "data": {
+                                                                                                            "id": "dffl7q4thr40",
+                                                                                                            "created": 1767507774645,
+                                                                                                            "text": "pci_scan_device"
+                                                                                                        },
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "data": {
+                                                                                                                    "id": "dffl82s64jk0",
+                                                                                                                    "created": 1767507802178,
+                                                                                                                    "text": "pci_setup_device(pci 0000:00:00.0: [1d94:1450] type 00 class 0x060000)"
+                                                                                                                },
+                                                                                                                "children": []
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "template": "structure",
+    "theme": "fresh-blue",
+    "version": "1.4.43"
+}

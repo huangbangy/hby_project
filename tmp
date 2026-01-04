@@ -1,0 +1,59 @@
+第三阶段：深入 —— 核心代码阅读路线（按此顺序）
+现在可以打开你的源码了。建议聚焦于一个主线内核版本（如你下载的版本）。
+
+路线图：从用户态调用到硬件访问
+入口：/drivers/pci/ 目录
+
+这是PCI子系统核心所在。不要一开始就看这里的具体实现，先看头文件。
+
+头文件概览：
+
+include/linux/pci.h：最重要的头文件。定义了所有关键数据结构（struct pci_dev, struct pci_bus, struct pci_driver）和API函数原型（pci_read_config_xxx, pci_enable_device等）。反复看，把这些结构和API印在脑子里。
+
+include/uapi/linux/pci_regs.h：定义了PCI配置空间的所有标准寄存器偏移量和位域（如 PCI_VENDOR_ID, PCI_BASE_ADDRESS_0）。这是内核与PCI标准的接口。
+
+核心初始化与枚举流程（理解“ PCI 设备是怎么被内核发现的”）：
+
+起点：内核启动时，架构相关代码会调用PCI子系统初始化。
+
+对于x86，查看 arch/x86/pci/ 目录，尤其是 init.c 或 common.c 中的 pci_legacy_init 或 pci_subsys_init。
+
+核心枚举：关键函数是 pci_scan_bridge() 和 pci_scan_slot()。它们会递归地扫描PCI总线。
+
+调用链建议（在你的IDE中用cscope追）：
+
+text
+start_kernel -> arch_call_rest_init -> ... -> pci_subsys_init -> pci_legacy_init
+-> pcibios_scan_root -> pci_scan_root_bus -> ...
+目标：不要求理解每一行，但要理清大致的函数调用关系和“扫描总线-发现设备-创建pci_dev”这个主流程。
+
+资源分配：
+
+设备被发现后，内核需要为它的BAR分配内存/IO空间。查看 pci_assign_resource() 和相关函数。理解 proc/iomem 和 proc/ioports 的输出与这里的关系。
+
+驱动匹配与probe：
+
+这是你写驱动时接触的部分。追踪一个PCI驱动是如何通过 pci_register_driver() 注册，其 .id_table 如何与设备匹配，最终调用到驱动自己的 .probe 方法。
+
+看一个简单真实的驱动例子，比如 drivers/misc/eeprom/ 下的 eeprom 驱动。
+
+配置空间访问的底层实现：
+
+这是连接软件和硬件的最后一步。函数如 pci_read_config_dword() 最终会调用 struct pci_ops 里的函数。
+
+对于x86，这个底层操作在 arch/x86/pci/direct.c 或 early.c 中，最终会使用 IN/OUT 指令或MMIO访问 0xCF8, 0xCFC 这两个I/O端口。理解这个机制就打通了任督二脉。
+
+第四阶段：实践与深化
+使用QEMU调试：
+
+这是终极学习神器。用QEMU启动一个Linux内核，并添加 -device pci-bridge,id=br0 -device e1000,bus=br0 等参数来添加虚拟PCI设备。
+
+结合 gdb 和QEMU的 -s -S 参数，单步跟踪PCI的初始化代码！亲眼看到数据结构的变化，理解是无法比拟的。
+
+给内核打补丁：
+
+尝试修改PCI核心代码中的某个打印信息（比如在 pci_scan_device 里加一句 printk），重新编译内核，在QEMU里运行，验证你的修改。这会让你熟悉内核编译和测试流程。
+
+阅读优秀、简单的PCI驱动：
+
+例如：drivers/char/ 下的 lp-pci（并口卡驱动），代码相对短小，包含了完整的PCI驱动框架。
