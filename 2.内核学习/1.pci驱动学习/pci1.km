@@ -93,7 +93,8 @@
                                                                                 "data": {
                                                                                     "id": "dfbeefa4rts0",
                                                                                     "created": 1767082311975,
-                                                                                    "text": "pci_scan_child_bus_extend"
+                                                                                    "text": "pci_scan_child_bus_extend",
+                                                                                    "note": "1????bus?????num???"
                                                                                 },
                                                                                 "children": [
                                                                                     {
@@ -123,7 +124,7 @@
                                                                                                             "id": "dffl7q4thr40",
                                                                                                             "created": 1767507774645,
                                                                                                             "text": "pci_scan_device",
-                                                                                                            "note": "read me",
+                                                                                                            "note": null,
                                                                                                             "expandState": "expand"
                                                                                                         },
                                                                                                         "children": [
@@ -145,15 +146,52 @@
                                                                                                                                 "data": {
                                                                                                                                     "id": "dffods9noz40",
                                                                                                                                     "created": 1767516712806,
-                                                                                                                                    "text": "__pci_read_base?pci_info(dev, \"HBY:reg 0x%x: %pR\n\", pos, res);?"
+                                                                                                                                    "text": "__pci_read_base?pci_info(dev, \"HBY:reg 0x%x: %pR\n\", pos, res);?",
+                                                                                                                                    "note": "??????? BAR ??????"
                                                                                                                                 },
-                                                                                                                                "children": []
+                                                                                                                                "children": [
+                                                                                                                                    {
+                                                                                                                                        "data": {
+                                                                                                                                            "id": "dfgn5xpgxpc0",
+                                                                                                                                            "created": 1767614836579,
+                                                                                                                                            "text": "pcibios_bus_to_resource",
+                                                                                                                                            "note": "??????????????????"
+                                                                                                                                        },
+                                                                                                                                        "children": []
+                                                                                                                                    }
+                                                                                                                                ]
                                                                                                                             }
                                                                                                                         ]
                                                                                                                     }
                                                                                                                 ]
                                                                                                             }
                                                                                                         ]
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        ]
+                                                                                    },
+                                                                                    {
+                                                                                        "data": {
+                                                                                            "id": "dfh54urjujs0",
+                                                                                            "created": 1767665531789,
+                                                                                            "text": "pcibios_fixup_bus+"
+                                                                                        },
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "data": {
+                                                                                                    "id": "dfh5519e07s0",
+                                                                                                    "created": 1767665545928,
+                                                                                                    "text": "pci_read_bridge_bases"
+                                                                                                },
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "data": {
+                                                                                                            "id": "dfh558u89ds0",
+                                                                                                            "created": 1767665562426,
+                                                                                                            "text": "pci_read_bridge_io?pci_info(dev, \"  bridge window %pR\n\", res);?"
+                                                                                                        },
+                                                                                                        "children": []
                                                                                                     }
                                                                                                 ]
                                                                                             }
