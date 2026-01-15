@@ -7,7 +7,7 @@ pci_scan_root_bus()：启动入口。
 
 pci_scan_child_bus()：递归扫描子总线。
 
-pci_bus_size_bridges()：调用 pbus_size_mem 等函数统计空间。
+pci_bus_size_bridges()：调用 pbus_size_mem 等函数统计空间，我们的内核参数传的值就是在这里被复制。
 
 pci_bus_assign_resources()：真正分配地址。
 ]
