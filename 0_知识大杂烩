@@ -1159,5 +1159,5 @@ lspci -nn
 lspci -vvv -s 00:1f.4
 
 
-
+bootloader：包括很多种，如U-Boot（常用于ARM和嵌入式系统）、GRUB（常用于x86的Linux）、LILO（Linux Loader）、Windows的bootmgr等。
 

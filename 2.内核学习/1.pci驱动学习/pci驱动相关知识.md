@@ -1,3 +1,18 @@
+看过的函数：
+pci_assign_unassigned_root_bus_resources
+
+__pci_bus_size_bridges默认热插拔最后分配资源的函数
+[
+pci_scan_root_bus()：启动入口。
+
+pci_scan_child_bus()：递归扫描子总线。
+
+pci_bus_size_bridges()：调用 pbus_size_mem 等函数统计空间。
+
+pci_bus_assign_resources()：真正分配地址。
+]
+
+pci_setup_bridge_io:写桥的io_base和limit，也会被pci_bus_assign_resources调用
 
 平台兼容性：
 在x86中，PCI总线地址通常通过ioremap映射到内核虚拟地址。
@@ -11,3 +26,5 @@
 物理表现,靠电平信号（物理连线）,靠 PCIe 报文（写内存）
 ACPI 依赖,强依赖 _PRT 表,不依赖 _PRT
 热插拔友好度,差（连线固定，容易冲突）,极好（动态分配，不会冲突）
+
+内核日志：在启动参数中加入 pci=debug，你可以在 dmesg 中看到完整的扫描和资源对齐过程
