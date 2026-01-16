@@ -14,6 +14,8 @@ pci_bus_assign_resources()：真正分配地址。
 
 pci_setup_bridge_io:写桥的io_base和limit，也会被pci_bus_assign_resources调用
 
+pcibios_resource_to_bus 的作用就是：把内核管理的 resource 物理地址，加上或减去一个 Offset（偏移量），转换成 PCI 硬件能识别的总线地址。
+
 平台兼容性：
 在x86中，PCI总线地址通常通过ioremap映射到内核虚拟地址。
 在ARM等架构中，可能需要通过MMU配置直接映射物理地址。
