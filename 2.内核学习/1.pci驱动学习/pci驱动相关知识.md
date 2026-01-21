@@ -18,6 +18,7 @@ pcibios_resource_to_bus 的作用就是：把内核管理的 resource 物理地址，加上或减去一
 
 acpi_pci_root_add 最先执行的acpi的函数
 
+pci_enable_device_flags 每个驱动程序都会不同的调用链调用它，就是被probe的时候
 
 【 硬件层 (Arch/Controller) 】       【 核心层 (PCI Core) 】          【 资源管理层 (Setup) 】
   (具体厂商如 Intel/Rockchip)         (通用逻辑 drivers/pci/)        (分配地皮 setup-bus.c)

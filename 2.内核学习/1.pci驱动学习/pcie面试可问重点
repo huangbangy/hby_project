@@ -1,3 +1,51 @@
 你既然是手动下电拔出，如果拔出瞬间链路产生了一个致命错误（Fatal Error），CPU 触发了 MCE（机器检查异常）导致重启，你怎么解？
 
 在内核中确保了 MMCONFIG 机制的稳定性。同时，为了支持 PCIe 扩展空间的 AER 错误寄存器 配置（它们在 256 字节偏移量之外），我必须确保系统的 ECAM 映射 在热插拔后依然保持一致性。
+
+
+第一题：地址空间冲突 (Resource Alignment)
+核心现象： lspci 能看到设备，但 dmesg 报错 no space for BAR，设备无法读写。
+
+底层根源：
+
+ACPI 层面： DSDT 里的 _CRS（当前资源设置）给父桥预留的 Window（窗口） 太小，装不下子设备的 BAR。
+
+PCI 层面： 桥窗口的基地址/限制寄存器（Base/Limit）配置错误，导致 TLP 报文无法路由到下游。
+
+解决方案： 1. 修改 BIOS 的 DSDT 表。 2. 内核层面使用启动参数 pci=realloc 强制重新分配。
+
+金句： “我会通过 DSDT 的 _CRS 静态描述与 桥寄存器 的动态值进行夹逼实验，确认是 BIOS 预留窗口不足导致的资源对齐失败。”
+
+第二题：中断路由失效 (Interrupt Routing)
+核心现象： 禁用 MSI-X（pci=nomsi）后，网卡驱动加载成功但无法通信，中断计数器 /proc/interrupts 为 0。
+
+底层根源：
+
+ACPI 层面： DSDT 里的 _PRT 表（接线图）描述错误。
+
+物理层面： 硬件引脚（INTx）连到了 A 引脚，但 BIOS 告诉内核去听 B 引脚，导致内核“听错了频道”。
+
+解决方案：
+
+检查 /proc/interrupts 是否有计数（心跳检测）。
+
+对比 lspci -v 里的中断引脚分配与 DSDT 表的一致性。
+
+金句： “在 Legacy 模式下，_PRT 是内核唯一的接线指南。如果计数为 0 且驱动超时，我会通过审计 DSDT 里的 GSI (Global System Interrupt) 映射来排查 BIOS 的描述缺陷。”
+
+第三题：热插拔死机 (Quiesce & CTO)
+核心现象： 物理拔卡瞬间系统卡死（Hard Lockup）或蓝屏。
+
+底层根源：
+
+TLP 层面： CPU 发出了读请求（Read Request），但在等待数据返回（Completion）时硬件突然消失，导致 Completion Timeout (CTO)。
+
+机制层面： 没有做 Quiesce（静默） 处理，即没有在物理断电前切断逻辑链路。
+
+解决方案：
+
+在 DSDT 的 _EJ0 方法中，通过 Command Register 禁用内存/IO 映射。
+
+操作 Link Control Register 将 Link Disable 置 1，优雅切断链路。
+
+金句： “为了防止 Completion Timeout 导致的系统挂死，必须在物理下电前执行 Link Disable，确保总线事务被干净地截断，而不是让 CPU 进入无限期等待。”
