@@ -57,3 +57,17 @@ start_kernel -> arch_call_rest_init -> ... -> pci_subsys_init -> pci_legacy_init
 阅读优秀、简单的PCI驱动：
 
 例如：drivers/char/ 下的 lp-pci（并口卡驱动），代码相对短小，包含了完整的PCI驱动框架。
+
+根总线初始化：
+
+pci_create_bus() 创建根总线（Root Bus），设置 resource[0/1] 和 secondary。
+根总线加入 pci_root_buses 链表。
+枚举子总线与设备：
+
+pci_scan_child_bus() 递归扫描所有设备。
+对桥接器调用 pci_create_bus() 创建子总线。
+对终端设备调用 pci_scan_device() 分配资源。
+资源分配与驱动绑定：
+
+所有设备的 BAR（Base Address Register）通过 resource[0/1] 分配物理地址。
+驱动通过 pci_register_driver() 注册，与设备匹配。

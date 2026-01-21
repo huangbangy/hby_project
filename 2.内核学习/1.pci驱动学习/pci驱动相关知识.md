@@ -16,6 +16,38 @@ pci_setup_bridge_io:写桥的io_base和limit，也会被pci_bus_assign_resources调用
 
 pcibios_resource_to_bus 的作用就是：把内核管理的 resource 物理地址，加上或减去一个 Offset（偏移量），转换成 PCI 硬件能识别的总线地址。
 
+acpi_pci_root_add 最先执行的acpi的函数
+
+
+【 硬件层 (Arch/Controller) 】       【 核心层 (PCI Core) 】          【 资源管理层 (Setup) 】
+  (具体厂商如 Intel/Rockchip)         (通用逻辑 drivers/pci/)        (分配地皮 setup-bus.c)
+          |                                     |                               |
+  1. 初始化控制器 ------------------->  2. pci_scan_root_bus()                  |
+     提供 pci_ops {read, write}                 |                               |
+          |                                     |                               |
+          | <---------- 回调 read() ----------  +-- pci_scan_child_bus()        |
+          |                                     |    (递归发现设备)              |
+          | ---------- 返回 Vendor ID --------> |    (调用 pci_scan_device)      |
+          |                                     |                               |
+          | <---------- 回调 write(全1) -------- +-- 探测 BAR Size               |
+          |                                     |                               |
+          +-------------------------------------+-------------------------------+
+                                                |
+                                        [ 此时：PCI 树已建好 ]
+                                                |
+                                                v
+                                        3. pci_bus_size_bridges() --------------+
+                                           (递归算账：pbus_size_mem)              |
+                                                |                               |
+                                                | <---------- 向上汇总 Size ------+
+                                                |                               |
+                                        [ 此时：预算已算清 ]
+                                                |
+                                                v
+                                        4. pci_assign_unassigned_resources() ---+
+                                           (真正划拨物理地址)                     |
+                                                |                               |
+                                                +----------- 写入 Base 地址 ------> [ 最终写入硬件 BAR ]
 平台兼容性：
 在x86中，PCI总线地址通常通过ioremap映射到内核虚拟地址。
 在ARM等架构中，可能需要通过MMU配置直接映射物理地址。
