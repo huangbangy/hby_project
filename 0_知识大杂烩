@@ -1166,3 +1166,5 @@ bootloader：包括很多种，如U-Boot（常用于ARM和嵌入式系统）、GRUB（常用于x86的Linu
 /proc/irq/165
 [root@localhost 165]# echo 02 > smp_affinity
 [root@localhost 165]#
+
+make -j32 V=1可以看出利用32个核进行编译，同时V=1可以看到具体的编译命令

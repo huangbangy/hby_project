@@ -5,6 +5,8 @@ https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/
 
 https://gitee.com/openeuler/kernel/
 
+欧拉相关x86_64软件包路径
+https://repo.openeuler.org/openEuler-22.03-LTS/everything/x86_64/Packages/
 
 pcie基础知识：https://r12f.com/posts/pcie-1-basics/#BDF%EF%BC%88Bus-Number-Device-Number-Function-Number%EF%BC%89
 
