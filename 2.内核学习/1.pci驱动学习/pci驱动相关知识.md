@@ -63,3 +63,17 @@ ACPI 依赖,强依赖 _PRT 表,不依赖 _PRT
 热插拔友好度,差（连线固定，容易冲突）,极好（动态分配，不会冲突）
 
 内核日志：在启动参数中加入 pci=debug，你可以在 dmesg 中看到完整的扫描和资源对齐过程
+
+PCI 驱动初始化阶段
+
+1. pure_initcall       - 参数初始化
+2. postcore_initcall   - 总线注册 ???
+3. arch_initcall       - ACPI/设备树集成 ???
+4. subsys_initcall     - 插槽管理 + 设备扫描 ?????
+5. late_initcall       - 调试接口
+
+内核模块相应的启动顺序，pci位于postcore_initcall和arch_initcall之间，pci设备的驱动程序一般会在subsys_initcall阶段被加载，而pci总线的初始化则在postcore_initcall阶段完成。
+pure_initcall → core_initcall → postcore_initcall → arch_initcall → 
+subsys_initcall → fs_initcall → device_initcall → late_initcall
+
+内存映射（Memory Mapping）的“执行者”是 NVMe 驱动，但它使用的“工具和权限”是由 PCIe 总线层提供的。

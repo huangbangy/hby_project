@@ -1172,3 +1172,16 @@ make -j32 V=1可以看出利用32个核进行编译，同时V=1可以看到具体的编译命令
 内核模块相应的启动顺序，pci位于postcore_initcall和arch_initcall之间，pci设备的驱动程序一般会在subsys_initcall阶段被加载，而pci总线的初始化则在postcore_initcall阶段完成。
 pure_initcall → core_initcall → postcore_initcall → arch_initcall → 
 subsys_initcall → fs_initcall → device_initcall → late_initcall
+
+volatile 的核心作用就是告诉编译器"不要优化这个内存访问，老老实实地每次都去硬件那里读取！
+
+"睡眠"（sleep） = 进程主动让出CPU，等待某个条件满足后被唤醒
+
+持有自旋锁 = 必须快速完成，不能让出CPU
+
+自旋锁：为了在中断上下文也能用，设计成不能睡眠（因为中断根本无法睡眠）
+互斥锁：为了在进程上下文能高效处理长等待，设计成可睡眠（避免浪费CPU）
+
+当一个线程试图获取已经被其他线程持有的 mutex 时，它会被挂起。挂起意味着该线程会被操作系统调度器切换出去，直到锁可用时再被唤醒。
+
+当一个线程试图获取已被持有的自旋锁时，它会进行忙等待（自旋），不断检查锁是否可用，而不是进入休眠状态。
