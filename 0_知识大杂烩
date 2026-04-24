@@ -1187,3 +1187,18 @@ volatile 的核心作用就是告诉编译器"不要优化这个内存访问，老老实实地每次都去硬件那
 当一个线程试图获取已被持有的自旋锁时，它会进行忙等待（自旋），不断检查锁是否可用，而不是进入休眠状态。
 
 arm架构不支持io端口访问,支持mmio访问，x86则都支持
+
+[root@localhost 0000:30:00.0]# lspci -vvv -s 30:00.0 |grep -A 5 "Region"
+        Region 0: Memory at 81200000 (64-bit, non-prefetchable) [size=16K]
+lspci查询到的是物理地址，通过下面的lspci -xxx -s也是可以看出的第一个bar就存着物理地址，低四位是对
+地址类型的判断
+BAR0 低4位 = 0x4 = 0100b
+
+bit 0 = 0 → 内存空间（非I/O）
+bit 2:1 = 10 → 64位地址空间
+bit 3 = 0 → 非预取内存
+bit 4-31 = 基地址
+[root@localhost 0000:30:00.0]# lspci -xxx -s 30:00.0
+30:00.0 Non-Volatile memory controller: Intel Corporation PCIe Data Center SSD (rev 01)
+00: 86 80 53 09 06 04 10 00 01 02 08 01 10 00 00 00
+10: 04 00 20 81 00 00 00 00 00 00 00 00 00 00 00 00
