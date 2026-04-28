@@ -1202,3 +1202,23 @@ bit 4-31 = 基地址
 30:00.0 Non-Volatile memory controller: Intel Corporation PCIe Data Center SSD (rev 01)
 00: 86 80 53 09 06 04 10 00 01 02 08 01 10 00 00 00
 10: 04 00 20 81 00 00 00 00 00 00 00 00 00 00 00 00
+
+cd /sys/bus/pci/devices/0000:30:00.0
+# 查看致命错误
+cat aer_dev_fatal
+
+# 查看非致命错误
+cat aer_dev_nonfatal
+
+# 查看可纠正错误
+cat aer_dev_correctable
+
+lspci -vvv -s 30：00.0的AER显示中
+Q：UESta和UESvrt的关系？
+
+UESta置位 (+)   │  ← 记录"发生了什么"
+查询UESvrt      │  ← 判断"有多严重"
+A：
+
+UESta是状态寄存器，报告错误是否发生
+UESvrt是配置寄存器，预定义每个错误的严重程度
