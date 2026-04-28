@@ -449,7 +449,7 @@ static ssize_t dev_rescan_store(struct device *dev,
 }
 static struct device_attribute dev_attr_dev_rescan = __ATTR(rescan, 0200, NULL,
 							    dev_rescan_store);
-
+/* 执行echo xxx remove执行的第一个函数 */
 static ssize_t remove_store(struct device *dev, struct device_attribute *attr,
 			    const char *buf, size_t count)
 {

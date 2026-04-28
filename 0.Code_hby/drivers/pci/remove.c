@@ -16,14 +16,14 @@ static void pci_free_resources(struct pci_dev *dev)
 
 static void pci_stop_dev(struct pci_dev *dev)
 {
-	pci_pme_active(dev, false);
+	pci_pme_active(dev, false);  // 禁用PME
 
-	if (pci_dev_is_added(dev)) {
-		device_release_driver(&dev->dev);
-		pci_proc_detach_device(dev);
-		pci_remove_sysfs_dev_files(dev);
+	if (pci_dev_is_added(dev)) { // 检查设备是否被添加到系统
+		device_release_driver(&dev->dev); // 解绑驱动
+		pci_proc_detach_device(dev); // 从proc分离
+		pci_remove_sysfs_dev_files(dev); // 删除sysfs文件
 
-		pci_dev_assign_added(dev, false);
+		pci_dev_assign_added(dev, false); //标记未添加
 	}
 }
 
@@ -118,6 +118,7 @@ void pci_stop_and_remove_bus_device(struct pci_dev *dev)
 }
 EXPORT_SYMBOL(pci_stop_and_remove_bus_device);
 
+/*用户可以 echo 1 > /sys/bus/pci/devices/0000:xx:xx.x/remove*/
 void pci_stop_and_remove_bus_device_locked(struct pci_dev *dev)
 {
 	pci_lock_rescan_remove();
