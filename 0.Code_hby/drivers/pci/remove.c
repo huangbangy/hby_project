@@ -20,7 +20,7 @@ static void pci_stop_dev(struct pci_dev *dev)
 
 	if (pci_dev_is_added(dev)) { // 检查设备是否被添加到系统
 		device_release_driver(&dev->dev); // 解绑驱动
-		pci_proc_detach_device(dev); // 从proc分离
+		pci_proc_detach_device(dev); // 从proc分离 /proc/bus/pci/30
 		pci_remove_sysfs_dev_files(dev); // 删除sysfs文件
 
 		pci_dev_assign_added(dev, false); //标记未添加
