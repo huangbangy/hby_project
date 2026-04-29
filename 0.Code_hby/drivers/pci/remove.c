@@ -81,7 +81,7 @@ static void pci_stop_bus_device(struct pci_dev *dev)
 
 	pci_stop_dev(dev);
 }
-
+/* 每个桥只管理一个subordinate buss，所以不会有外层循环的嵌套*/
 static void pci_remove_bus_device(struct pci_dev *dev)
 {
 	struct pci_bus *bus = dev->subordinate;

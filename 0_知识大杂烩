@@ -1222,3 +1222,16 @@ A：
 
 UESta是状态寄存器，报告错误是否发生
 UESvrt是配置寄存器，预定义每个错误的严重程度
+
+一个桥能管理多个总线吗？	不能，每个桥只管理一个subordinate bus
+
+概念	中文	数量	含义
+Primary Bus	主总线	1个	桥所在的总线
+Secondary Bus	次级总线	1个	桥直接连接的下级总线
+Subordinate Bus	从属总线	1个	下级总线的最大编号
+在pci配置的0x18 0x19 0x20寄存器的位置
+
+作用：PCI事务路由
+- 如果目标总线 < Primary    → 往上游转发
+- 如果目标总线 = Secondary  → 发送到该总线
+- 如果目标总线 > Secondary 且 ≤ Subordinate → 往下游转发
