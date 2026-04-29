@@ -114,7 +114,7 @@ static void pci_remove_bus_device(struct pci_dev *dev)
 void pci_stop_and_remove_bus_device(struct pci_dev *dev)
 {
 	pci_stop_bus_device(dev);
-	pci_remove_bus_device(dev);
+	pci_remove_bus_device(dev); //移除设备
 }
 EXPORT_SYMBOL(pci_stop_and_remove_bus_device);
 
