@@ -26,8 +26,14 @@ static void pci_stop_dev(struct pci_dev *dev)
 		pci_dev_assign_added(dev, false); //标记未添加
 	}
 }
-
-static void pci_destroy_dev(struct pci_dev *dev)
+/*
+从设备模型删除
+从总线链表删除
+清除电源管理状态
+释放bar资源
+释放设备引用
+*/
+static void pci_destroy_dev(struct pci_dev *dev) //销毁设备结构
 {
 	if (!dev->dev.kobj.parent)
 		return;
@@ -113,7 +119,7 @@ static void pci_remove_bus_device(struct pci_dev *dev)
  */
 void pci_stop_and_remove_bus_device(struct pci_dev *dev)
 {
-	pci_stop_bus_device(dev);
+	pci_stop_bus_device(dev); // 停止设备
 	pci_remove_bus_device(dev); //移除设备
 }
 EXPORT_SYMBOL(pci_stop_and_remove_bus_device);
