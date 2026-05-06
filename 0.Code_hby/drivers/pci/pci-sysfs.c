@@ -397,7 +397,12 @@ static ssize_t msi_bus_store(struct device *dev, struct device_attribute *attr,
 	return count;
 }
 static DEVICE_ATTR_RW(msi_bus);
+/*
+bus_rescan_store：针对特定 PCI 总线实例（pci_bus），如 /sys/bus/pci/devices/0000:00/rescan。
+dev_rescan_store：针对特定 PCI 设备实例（pci_dev），如 /sys/bus/pci/devices/0000:00:1f.0/rescan。
+rescan_store（你提到的）：针对整个 PCI 总线类型（bus_type），如 /sys/bus/pci/rescan。
 
+*/
 static ssize_t rescan_store(struct bus_type *bus, const char *buf, size_t count)
 {
 	unsigned long val;
