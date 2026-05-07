@@ -1252,7 +1252,7 @@ EXPORT_SYMBOL(pci_free_irq_vectors);
  * @dev: PCI device to operate on
  * @nr: device-relative interrupt vector index (0-based).
  */
-int pci_irq_vector(struct pci_dev *dev, unsigned int nr)
+int pci_irq_vector(struct pci_dev *dev, unsigned int nr)/* 获取中断号 */
 {
 	if (dev->msix_enabled) {
 		struct msi_desc *entry;

@@ -398,11 +398,10 @@ static ssize_t msi_bus_store(struct device *dev, struct device_attribute *attr,
 }
 static DEVICE_ATTR_RW(msi_bus);
 /*
-bus_rescan_store：针对特定 PCI 总线实例（pci_bus），如 /sys/bus/pci/devices/0000:00/rescan。
-dev_rescan_store：针对特定 PCI 设备实例（pci_dev），如 /sys/bus/pci/devices/0000:00:1f.0/rescan。
-rescan_store（你提到的）：针对整个 PCI 总线类型（bus_type），如 /sys/bus/pci/rescan。
-
-*/
+ * 全局 PCI rescan 入口：/sys/bus/pci/rescan
+ * 这个函数按总线类型遍历所有 PCI 总线，并对每个总线调用 pci_rescan_bus。
+ * 用于系统级别重新枚举所有 PCI 总线上的设备。
+ */
 static ssize_t rescan_store(struct bus_type *bus, const char *buf, size_t count)
 {
 	unsigned long val;
@@ -435,6 +434,10 @@ const struct attribute_group *pci_bus_groups[] = {
 	NULL,
 };
 
+/*
+ * 设备级 PCI rescan 入口：/sys/bus/pci/devices/<device>/rescan
+ * 这个函数接收用户写入的 rescan 命令，然后重新扫描该设备所在的总线。
+ */
 static ssize_t dev_rescan_store(struct device *dev,
 				struct device_attribute *attr, const char *buf,
 				size_t count)
@@ -470,6 +473,10 @@ static ssize_t remove_store(struct device *dev, struct device_attribute *attr,
 static DEVICE_ATTR_IGNORE_LOCKDEP(remove, 0220, NULL,
 				  remove_store);
 
+/*
+ * 总线实例级 PCI rescan 入口：/sys/bus/pci/devices/<bus>/rescan
+ * 这个函数针对某一条 PCI 总线执行重新扫描，桥接器可能先重置后扫描。
+ */
 static ssize_t bus_rescan_store(struct device *dev,
 				struct device_attribute *attr,
 				const char *buf, size_t count)

@@ -30,6 +30,7 @@
  *
  * @dev_id must not be NULL and must be globally unique.
  */
+/* 注册中断处理函数 */ 
 int pci_request_irq(struct pci_dev *dev, unsigned int nr, irq_handler_t handler,
 		irq_handler_t thread_fn, void *dev_id, const char *fmt, ...)
 {

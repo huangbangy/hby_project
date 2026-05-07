@@ -3226,9 +3226,9 @@ unsigned int pci_rescan_bus(struct pci_bus *bus)
 {
 	unsigned int max;
 
-	max = pci_scan_child_bus(bus);
-	pci_assign_unassigned_bus_resources(bus);
-	pci_bus_add_devices(bus);
+	max = pci_scan_child_bus(bus); /* 扫描子设备 */
+	pci_assign_unassigned_bus_resources(bus); /* 分配资源 */
+	pci_bus_add_devices(bus); /* 添加设备 */
 
 	return max;
 }
