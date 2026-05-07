@@ -1235,3 +1235,23 @@ Subordinate Bus	从属总线	1个	下级总线的最大编号
 - 如果目标总线 < Primary    → 往上游转发
 - 如果目标总线 = Secondary  → 发送到该总线
 - 如果目标总线 > Secondary 且 ≤ Subordinate → 往下游转发
+
+MSI中断申请流程
+1：检查设备是否支持msi
+if (pci_find_capability(pdev, PCI_CAP_ID_MSI)) {
+    // 设备支持MSI
+}
+// 检查设备是否支持MSI-X
+if (pci_find_capability(pdev, PCI_CAP_ID_MSIX)) {
+    // 设备支持MSI-X
+}
+2：申请msi中断
+// 申请MSI中断（1-4个向量）
+int vectors = pci_alloc_irq_vectors(pdev, 1, 4, PCI_IRQ_ALL_TYPES);
+
+// 获取中断号
+int irq = pci_irq_vector(pdev, 0);
+3：注册中断处理函数
+request_irq(irq, my_interrupt_handler, 0, "my_device", dev);
+4：中断处理
+my_interrupt_handler的实现

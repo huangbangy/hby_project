@@ -31,6 +31,12 @@
  * @dev_id must not be NULL and must be globally unique.
  */
 /* 注册中断处理函数 */ 
+/*
+handler 处理紧急、必须快速完成的硬件确认
+thread_fn 处理复杂逻辑和可睡眠操作
+这种设计可以把中断响应和实际工作分离，减小顶半部占用时间，提高系统稳定性
+*/
+
 int pci_request_irq(struct pci_dev *dev, unsigned int nr, irq_handler_t handler,
 		irq_handler_t thread_fn, void *dev_id, const char *fmt, ...)
 {
