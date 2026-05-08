@@ -1255,3 +1255,9 @@ int irq = pci_irq_vector(pdev, 0);
 request_irq(irq, my_interrupt_handler, 0, "my_device", dev);
 4：中断处理
 my_interrupt_handler的实现
+
+动作,执行者,目的
+创建 pci_dev,PCI 核心层,在内核软件层面建立该物理设备的抽象对象，存储设备身份信息。
+分配物理 BAR 地址,PCI 核心层,在 PCI 总线地址空间内为设备划拨“地皮”（物理地址区间），并写入设备配置空间。
+开启设备电源与中断,NVMe 驱动,通过 pci_enable_device 激活硬件，使其从低功耗状态唤醒并准备好处理中断。
+虚拟地址映射 (ioremap),NVMe 驱动,将分配好的物理 BAR 地址映射到内核虚拟地址空间，使驱动能通过指针读写 SSD 寄存器。
