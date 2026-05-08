@@ -1025,7 +1025,7 @@ static inline int nvme_process_cq(struct nvme_queue *nvmeq)
 		nvme_ring_cq_doorbell(nvmeq);
 	return found;
 }
-
+/* 中断处理函数 */
 static irqreturn_t nvme_irq(int irq, void *data)
 {
 	struct nvme_queue *nvmeq = data;
@@ -1505,7 +1505,7 @@ static int nvme_alloc_queue(struct nvme_dev *dev, int qid, int depth)
  free_nvmeq:
 	return -ENOMEM;
 }
-
+/* nvme调用中断注册函数 */
 static int queue_request_irq(struct nvme_queue *nvmeq)
 {
 	struct pci_dev *pdev = to_pci_dev(nvmeq->dev->dev);
@@ -2059,7 +2059,7 @@ static void nvme_calc_irq_sets(struct irq_affinity *affd, unsigned int nrirqs)
 	affd->set_size[HCTX_TYPE_READ] = nr_read_queues;
 	affd->nr_sets = nr_read_queues ? 2 : 1;
 }
-
+/* 分配中断号 */
 static int nvme_setup_irqs(struct nvme_dev *dev, unsigned int nr_io_queues)
 {
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
