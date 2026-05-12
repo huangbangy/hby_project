@@ -112,3 +112,19 @@ static struct i2c_driver my_driver = {
 };
 // ===== 第5部分：模块注册 =====
 module_i2c_driver(my_driver);
+
+probe所做的
+ // 1. 分配私有数据
+    data = devm_kzalloc(dev, sizeof(struct lm75_data), GFP_KERNEL);
+// 2. 初始化regmap（I2C寄存器访问）
+    data->regmap = devm_regmap_init_i2c(client, &lm75_regmap_config);    
+    // 3. 读取芯片配置
+    regmap_read(data->regmap, LM75_REG_CONF, &data->orig_conf);
+       // 4. 配置芯片
+    regmap_write(data->regmap, LM75_REG_CONF, data->orig_conf | set_mask);
+        
+    // 5. 注册hwmon设备
+    data->hwmon_dev = devm_hwmon_device_register_with_groups(dev, 
+                    client->name, data, lm75_groups);
+        // 6. 保存私有数据
+    i2c_set_clientdata(client, data);                
