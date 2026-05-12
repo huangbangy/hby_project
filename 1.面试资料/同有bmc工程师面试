@@ -74,3 +74,41 @@ I2C Device Driver (设备驱动)：这是你最常接触的一层。比如一个 LM75 温度传感器驱动
 代码复用：一个 AST2600 的 适配器驱动 写好后，上面可以挂几十种不同的 设备驱动（温度计、EEPROM、风扇控制器），这些设备驱动都不需要重写底层的电平控制代码。
 
 并发管理：如果多个驱动同时想用总线，由适配器驱动统一调度，避免总线冲突。
+
+iic设备驱动
+每个I2C设备驱动都由以下5个固定部分组成：
+// ===== 第1部分：设备私有数据结构 =====
+struct my_device_data {
+    struct i2c_client *client;
+    // ... 设备特定的数据
+};
+// ===== 第2部分：设备ID表 =====
+static const struct i2c_device_id my_device_id[] = {
+    { "my_device", 0 },
+    { }  // 结尾
+};
+MODULE_DEVICE_TABLE(i2c, my_device_id);
+// ===== 第3部分：probe和remove函数 =====
+static int my_probe(struct i2c_client *client, const struct i2c_device_id *id)
+{
+    // 初始化设备
+    return 0;
+}
+static int my_remove(struct i2c_client *client)
+{
+    // 清理资源
+    return 0;
+}
+
+// ===== 第4部分：i2c_driver结构体 =====
+static struct i2c_driver my_driver = {
+    .driver = {
+        .name = "my_device",
+        .of_match_table = my_of_match,  // 设备树匹配
+    },
+    .probe = my_probe,
+    .remove = my_remove,
+    .id_table = my_device_id,
+};
+// ===== 第5部分：模块注册 =====
+module_i2c_driver(my_driver);
