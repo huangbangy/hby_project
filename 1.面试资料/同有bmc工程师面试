@@ -1,3 +1,10 @@
+问的问题
+1：pmbus是什么
+2：ipmi协议是什么
+3：bar空间的大小是固定的嘛，为什么bus号要写死，假如双cpu的话会不会有风险
+
+
+
 面试准备:
 在 BMC 开发中，设备树 (Device Tree, DT) 是描述硬件物理结构的“说明书”。由于嵌入式 CPU（如 ARM）无法像 X86 架构那样通过总线自动发现所有硬件，它必须依赖设备树告诉内核：哪个寄存器在哪、用了哪个中断、挂了什么芯片。
 
@@ -128,3 +135,22 @@ probe所做的
                     client->name, data, lm75_groups);
         // 6. 保存私有数据
     i2c_set_clientdata(client, data);                
+
+     
+在probe中如何读写I2C设备
+// 方法2：使用i2c_smbus_*（SMBus协议，推荐）
+i2c_smbus_read_byte_data(client, reg);     // 读1字节
+i2c_smbus_write_byte_data(client, reg, val); // 写1字节
+i2c_smbus_read_word_data(client, reg);     // 读2字节
+i2c_smbus_write_word_data(client, reg, val); // 写2字节
+
+不同的只是probe里面的具体实现：
+温度传感器（lm75）：用regmap读写寄存器，注册hwmon子系统
+EEPROM（at24）：用i2c_smbus读写，注册sysfs接口
+输入设备（触控）：用i2c_transfer读数据，注册input子系统
+
+维度,I2C 适配器驱动 (Adapter),I2C 设备驱动 (Device/Client)
+层级,底层（硬件控制器级）,上层（业务外设级）
+操作对象,BMC 芯片内部的 I2C 控制器 (如 AST2600 I2C Controller),挂在总线上的具体芯片 (如温感、EEPROM、CPLD)
+主要任务,初始化时钟、配置寄存器、申请 IRQ、向内核注册总线,验证硬件 ID、初始化外设、向内核框架（如 hwmon）注册功能
+触发时机,当内核发现 I2C 控制器硬件资源（通常通过 DTS 里的总线节点匹配）,当总线已经就绪，且发现 DTS 里的设备节点与驱动 compatible 匹配
