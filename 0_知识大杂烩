@@ -1261,3 +1261,12 @@ my_interrupt_handler的实现
 分配物理 BAR 地址,PCI 核心层,在 PCI 总线地址空间内为设备划拨“地皮”（物理地址区间），并写入设备配置空间。
 开启设备电源与中断,NVMe 驱动,通过 pci_enable_device 激活硬件，使其从低功耗状态唤醒并准备好处理中断。
 虚拟地址映射 (ioremap),NVMe 驱动,将分配好的物理 BAR 地址映射到内核虚拟地址空间，使驱动能通过指针读写 SSD 寄存器。
+
+先把第一个桥的整棵子树（包括子桥、孙桥）全分配完，再回头分配第二个桥的子树。 这是深度优先遍历，Bus号是按发现Bridge的先后顺序递增的，不是按层级分配的。
+
+学习路线模板：
+1. PCIe 基础：枚举、配置空间、BAR、MSI/MSI-X、DMA
+2. PCIe 设备驱动模板
+3. NVMe 驱动核心流程
+4. blk-mq / queue / doorbell / completion
+5. PCIe 总线驱动、RC、资源分配、MSI domain

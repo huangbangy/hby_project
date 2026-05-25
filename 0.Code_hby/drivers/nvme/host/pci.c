@@ -2324,12 +2324,12 @@ static int nvme_pci_enable(struct nvme_dev *dev)
 	int result = -ENOMEM;
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 
-	if (pci_enable_device_mem(pdev))
+	if (pci_enable_device_mem(pdev))/* 唤醒设备，使能memory空间访问 */
 		return result;
 
-	pci_set_master(pdev);
+	pci_set_master(pdev); /* 设置Bus Master,使能DMA */
 
-	if (dma_set_mask_and_coherent(dev->dev, DMA_BIT_MASK(64)))
+	if (dma_set_mask_and_coherent(dev->dev, DMA_BIT_MASK(64))) /* 可以访问64位地址 */
 		goto disable;
 
 	if (readl(dev->bar + NVME_REG_CSTS) == -1) {
