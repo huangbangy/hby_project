@@ -109,49 +109,49 @@ static bool __nvme_disable_io_queues(struct nvme_dev *dev, u8 opcode);
  * Represents an NVM Express device.  Each nvme_dev is a PCI function.
  */
 struct nvme_dev {
-	struct nvme_queue *queues;
-	struct blk_mq_tag_set tagset;
-	struct blk_mq_tag_set admin_tagset;
-	u32 __iomem *dbs;
-	struct device *dev;
-	struct dma_pool *prp_page_pool;
-	struct dma_pool *prp_small_pool;
-	unsigned online_queues;
-	unsigned max_qid;
-	unsigned io_queues[HCTX_MAX_TYPES];
-	unsigned int num_vecs;
-	u32 q_depth;
-	int io_sqes;
-	u32 db_stride;
-	void __iomem *bar;
-	unsigned long bar_mapped_size;
-	struct work_struct remove_work;
-	struct mutex shutdown_lock;
-	bool subsystem;
-	u64 cmb_size;
-	bool cmb_use_sqes;
-	u32 cmbsz;
-	u32 cmbloc;
-	struct nvme_ctrl ctrl;
-	u32 last_ps;
+	struct nvme_queue *queues;		/* 设备所有 I/O 队列数组 */
+	struct blk_mq_tag_set tagset; 	/* I/O 队列对应的 blk-mq tag 集合 */
+	struct blk_mq_tag_set admin_tagset; /* 管理队列对应的 blk-mq tag 集合 */
+	u32 __iomem *dbs; 			/* doorbell 寄存器基址，按 qid 和 stride 计算 */
+	struct device *dev; 			/* PCI 设备对应的通用 device 结构 */
+	struct dma_pool *prp_page_pool; 	/* PRP 页列表的 DMA 池 */
+	struct dma_pool *prp_small_pool; 	/* 小 PRP/SGL 结构的 DMA 池 */
+	unsigned online_queues; 		/* 当前已经在线（启用）的 I/O 队列数量 */
+	unsigned max_qid; 			/* 最大允许的队列 ID（包括 admin 队列） */
+	unsigned io_queues[HCTX_MAX_TYPES]; /* 每种 hw context 的 I/O 队列数量 */
+	unsigned int num_vecs; 		/* 已分配的 MSI/MSI-X 中断向量数 */
+	u32 q_depth; 				/* I/O 队列深度（实际使用的队列长度） */
+	int io_sqes; 				/* I/O 提交队列项大小编码（SQE size field） */
+	u32 db_stride; 			/* doorbell 寄存器步长，按 CAP::STRIDE 计算 */
+	void __iomem *bar; 			/* PCI BAR 映射后的寄存器基址 */
+	unsigned long bar_mapped_size; 	/* 已映射 BAR 的大小 */
+	struct work_struct remove_work; 	/* 设备移除延迟处理工作 */
+	struct mutex shutdown_lock; 	/* 关机/重置时序保护锁 */
+	bool subsystem; 			/* 是否为 NVMe 子系统模式（subsystem reset） */
+	u64 cmb_size; 			/* CMB（controller memory buffer）的总大小 */
+	bool cmb_use_sqes; 		/* 是否使用 CMB 来存储 SQE */
+	u32 cmbsz; 				/* CMB 大小与控制位寄存器值 */
+	u32 cmbloc; 			/* CMB 基址寄存器值 */
+	struct nvme_ctrl ctrl; 		/* 内部 NVMe 控制器通用状态 */
+	u32 last_ps; 			/* 上次进入的电源状态 */
 
-	mempool_t *iod_mempool;
+	mempool_t *iod_mempool; 		/* I/O 描述符（iod）对象池 */
 
 	/* shadow doorbell buffer support: */
-	u32 *dbbuf_dbs;
-	dma_addr_t dbbuf_dbs_dma_addr;
-	u32 *dbbuf_eis;
-	dma_addr_t dbbuf_eis_dma_addr;
+	u32 *dbbuf_dbs; 			/* shadow doorbell buffer 的 doorbell 区域 */
+	dma_addr_t dbbuf_dbs_dma_addr; 	/* shadow doorbell buffer 的 DMA 物理地址 */
+	u32 *dbbuf_eis; 			/* doorbell event index 的 shadow 存储 */
+	dma_addr_t dbbuf_eis_dma_addr; 	/* doorbell event index 的 DMA 物理地址 */
 
 	/* host memory buffer support: */
-	u64 host_mem_size;
-	u32 nr_host_mem_descs;
-	dma_addr_t host_mem_descs_dma;
-	struct nvme_host_mem_buf_desc *host_mem_descs;
-	void **host_mem_desc_bufs;
-	unsigned int nr_allocated_queues;
-	unsigned int nr_write_queues;
-	unsigned int nr_poll_queues;
+	u64 host_mem_size; 		/* 主机内存缓冲区（HMB）总大小 */
+	u32 nr_host_mem_descs; 		/* HMB 描述符数量 */
+	dma_addr_t host_mem_descs_dma; 	/* HMB 描述符表的 DMA 地址 */
+	struct nvme_host_mem_buf_desc *host_mem_descs; /* HMB 描述符表指针 */
+	void **host_mem_desc_bufs; 	/* 每个 HMB 描述符对应的数据缓冲指针 */
+	unsigned int nr_allocated_queues; 	/* 实际分配的 I/O 队列数 */
+	unsigned int nr_write_queues; 	/* 写队列的数量 */
+	unsigned int nr_poll_queues; 	/* 轮询队列的数量 */
 };
 
 static int io_queue_depth_set(const char *val, const struct kernel_param *kp)
@@ -1706,16 +1706,16 @@ static int nvme_pci_configure_admin_queue(struct nvme_dev *dev)
 	aqa |= aqa << 16;
 
 	writel(aqa, dev->bar + NVME_REG_AQA);
-	lo_hi_writeq(nvmeq->sq_dma_addr, dev->bar + NVME_REG_ASQ);
-	lo_hi_writeq(nvmeq->cq_dma_addr, dev->bar + NVME_REG_ACQ);
+	lo_hi_writeq(nvmeq->sq_dma_addr, dev->bar + NVME_REG_ASQ); // 写SQ地址
+	lo_hi_writeq(nvmeq->cq_dma_addr, dev->bar + NVME_REG_ACQ); // 写CQ地址
 
-	result = nvme_enable_ctrl(&dev->ctrl);
+	result = nvme_enable_ctrl(&dev->ctrl); //使能控制器
 	if (result)
 		return result;
 
 	nvmeq->cq_vector = 0;
 	nvme_init_queue(nvmeq, 0);
-	result = queue_request_irq(nvmeq);
+	result = queue_request_irq(nvmeq); //注册中断
 	if (result) {
 		dev->online_queues--;
 		return result;
@@ -2107,7 +2107,7 @@ static unsigned int nvme_max_io_queues(struct nvme_dev *dev)
 	return num_possible_cpus() + dev->nr_write_queues + dev->nr_poll_queues;
 }
 
-static int nvme_setup_io_queues(struct nvme_dev *dev)
+static int nvme_setup_io_queues(struct nvme_dev *dev) /* 创建IO队列 */
 {
 	struct nvme_queue *adminq = &dev->queues[0];
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
@@ -2129,10 +2129,10 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
 	if (dev->ctrl.quirks & NVME_QUIRK_SHARED_TAGS)
 		nr_io_queues = 1;
 	else
-		nr_io_queues = min(nvme_max_io_queues(dev),
+		nr_io_queues = min(nvme_max_io_queues(dev),/* 计算io队列数量 */
 				   dev->nr_allocated_queues - 1);
 
-	result = nvme_set_queue_count(&dev->ctrl, &nr_io_queues);
+	result = nvme_set_queue_count(&dev->ctrl, &nr_io_queues); /* 发送Admin命令设置队列数 */
 	if (result < 0)
 		return result;
 
@@ -2545,7 +2545,7 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev)
 		nvme_put_ctrl(&dev->ctrl);
 }
 
-static void nvme_reset_work(struct work_struct *work)
+static void nvme_reset_work(struct work_struct *work) /* 真正的初始化 */
 {
 	struct nvme_dev *dev =
 		container_of(work, struct nvme_dev, ctrl.reset_work);
@@ -2566,11 +2566,11 @@ static void nvme_reset_work(struct work_struct *work)
 	nvme_sync_queues(&dev->ctrl);
 
 	mutex_lock(&dev->shutdown_lock);
-	result = nvme_pci_enable(dev);
+	result = nvme_pci_enable(dev); /* 使能pci设备+DMA */
 	if (result)
 		goto out_unlock;
 
-	result = nvme_pci_configure_admin_queue(dev);
+	result = nvme_pci_configure_admin_queue(dev); /* 管理队列 */
 	if (result)
 		goto out_unlock;
 
@@ -2638,7 +2638,7 @@ static void nvme_reset_work(struct work_struct *work)
 			goto out;
 	}
 
-	result = nvme_setup_io_queues(dev);
+	result = nvme_setup_io_queues(dev); //创建IO队列
 	if (result)
 		goto out;
 
