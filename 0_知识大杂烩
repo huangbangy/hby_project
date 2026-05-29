@@ -1270,3 +1270,5 @@ my_interrupt_handler的实现
 3. NVMe 驱动核心流程
 4. blk-mq / queue / doorbell / completion
 5. PCIe 总线驱动、RC、资源分配、MSI domain
+
+/sys/bus/按物理连接分类（PCI/I2C/USB），/sys/class/按功能分类（hwmon/net/block），/sys/devices/是真实物理拓扑，bus和class下都是指向devices的软链接。同一个设备从不同维度看会出现在不同位置。
