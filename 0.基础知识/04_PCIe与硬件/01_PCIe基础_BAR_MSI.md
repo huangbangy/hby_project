@@ -1,202 +1,170 @@
-﻿# PCIe 基础、BAR 与 MSI
+# PCIe 基础、BAR 与 MSI
 
-> 从 `0_知识大杂烩` 原始备份按行号整理，内容未做语义改写。
+这份笔记用于快速复习 PCIe 设备枚举、配置空间、BAR、PMIO/MMIO、MSI 和常见调试命令。
 
-## 原始行 184-192
+## 常用命令
 
-2.3.1 pci相关
-2.3.1.1 pci相关概念
-1）PCI设备的配置空间共由 64个字节组成，其地址范围为 0x00 ~ 0x3F，这 64个字节是所有 PCI设备必须支持的
-2.3.1.2 pci相关命令
-1)setpci -s 0a:00.0 A0.b=0x01修改 0a:00.0设备配置空间 A0地址处 1字节的内容
-2)lspci -tv 看pci设备树状图
-2.3.1.2 pci相关速率
-lspci -k 可以看出所有pci设备对应的驱动程序
+| 命令 | 用途 |
+| --- | --- |
+| `lspci -tv` | 以树形结构查看 PCI/PCIe 设备 |
+| `lspci -k` | 查看设备绑定的驱动 |
+| `lspci -n` | 查看厂商 ID 和设备 ID |
+| `lspci -nn` | 同时显示名称和 ID |
+| `lspci -vvv -s 00:1f.4` | 查看指定设备详细信息 |
+| `lspci -xxx -s 05:0e.0` | 查看配置空间内容 |
+| `setpci -s 0a:00.0 A0.b=0x01` | 修改指定设备配置空间 A0 偏移处 1 字节 |
+| `cat /proc/iomem` | 查看内存映射 I/O 区域 |
+| `cat /proc/ioports` | 查看 I/O 端口分配 |
 
+## BDF 地址
 
-## 原始行 795-795
+PCIe 设备常用 `Bus:Device.Function` 标识。
 
-由于PCI总线高性能低延迟的特性，它用来扩展的是CPU的存储域和IO域。
+```text
+02:00.0
+```
 
-## 原始行 809-814
+| 字段 | 含义 |
+| --- | --- |
+| `02` | Bus，总线号 |
+| `00` | Device，设备号 |
+| `0` | Function，功能号 |
 
-例如，在 02:00.0 中：
+## 配置空间
 
-02 是总线号。
-00 是设备号。
-0 是函数号。
+- 传统 PCI 配置空间通常是 256 字节，其中前 64 字节是标准头部区域。
+- PCIe 设备配置空间可扩展到 4096 字节，256 字节之后是扩展配置空间。
+- 配置空间中保存厂商 ID、设备 ID、Command/Status、BAR、中断能力等信息。
 
+查看配置空间：
 
-## 原始行 821-824
-
-cat /proc/iomem
-
-看出所有寄存器的数据
-lspci -xxx -s 05:0e.0
-
-## 原始行 874-880
-
-I/O 端口空间：最大 64KB（x86 架构），通过 in/out 指令访问，受16位地址的影响。
-I/O 内存空间：无统一上限，通过内存映射访问，最小单位通常是 4KB。
-
-
-类型	地址空间	宽度
-I/O端口	64KB	16位
-内存地址	4GB/1TB+	32位/64位
-
-## 原始行 888-889
-
-Primary Bus Number:主总线号，表示桥设备上游总线号，即桥连接的上一级总线的编号，用于标识桥所属的根总线 4）Secondary Bus Number:次总线号,指桥设备直接连接的下游总线号，是桥下游第一个PCI总线的编号 5）Subordinate Bus Number:从属总线号,是该桥下所有总线中最大的总线号，代表以该桥为根的子树中，总线号的最大值。
-
-
-## 原始行 921-922
-
-MSI中断机制是一种通过内存写入操作来触发中断的现代化技术，它解决了传统中断机制的瓶颈，极大地提升了系统的I/O性能和响应速度，是现代计算机体系结构中至关重要的一环。
-
-
-## 原始行 945-955
-
-“PCIe 设备的扩展配置空间”： PCIe 设备除了前 256 字节的标准配置空间，后面还有额外的“扩展配置空间”，总共可达 4096 字节。访问这个空间是配置和管理高级 PCIe 设备（如 SSD、万兆网卡）的基础。
-
-操作 I/O 端口
-在 Linux 设备驱动中，操作 I/O 端口通常遵循“申请-访问-释放”的步骤：
-
-申请端口：使用 request_region 函数向内核申请一段 I/O 端口区域。如果成功，该区域就会出现在 /proc/ioports 中。（存储设备中V3之前的采取request的方法，后面的采取bios预留的方法）
-
-访问端口：使用 inb、outb 等专用函数进行读写。
-
-释放端口：使用 release_region 函数释放不再使用的端口。
-
-
-## 原始行 1056-1061
-
-查看pci设备的配置空间内容
-PCI设备的配置空间共由 64个字节组成，其地址范围为 0x00 ~ 0x3F，这 64个字节是所有 PCI设备必须支持的
+```bash
 lspci -s 17:00.0 -xxx
-修改 0a:00.0设备配置空间 A0地址处 1字节的内容
-$ setpci -s 0a:00.0 A0.b=0x01 
+```
 
+修改配置空间示例：
 
-## 原始行 1106-1117
+```bash
+setpci -s 0a:00.0 A0.b=0x01
+```
 
-第九章 与硬件通信
-******************************************************************************************************************
-特性        | I/O 端口 (PMIO)                 | I/O 内存 (MMIO)
------------|---------------------------------|----------------------------------------
-地址空间    | 独立的 I/O 地址空间             | 与内存共享地址空间
-访问指令    | 专用 I/O 指令（IN/OUT）         | 普通内存访问指令
-地址大小    | 通常 16 位（64K 端口）         | 32 位或 64 位
-性能        | 较慢                            | 较快（可利用缓存）
-常见设备    | 传统 PC 设备（DMA、中断控制器） | 现代设备（PCIe、显卡）
-映射需求    | 不需要映射                      | 需要映射到虚拟地址空间
-Linux API   | inb()/outb() 系列               | ioread()/iowrite() 系列
+## PMIO 与 MMIO
 
+| 特性 | I/O 端口 PMIO | I/O 内存 MMIO |
+| --- | --- | --- |
+| 地址空间 | 独立 I/O 地址空间 | 与内存共享地址空间 |
+| 常见地址规模 | x86 常见 64KB | 32 位或 64 位地址空间 |
+| 访问指令 | `in` / `out` | 普通内存访问语义 |
+| Linux API | `inb()` / `outb()` | `ioread*()` / `iowrite*()` |
+| 是否需要映射 | 通常不需要 | 需要映射到内核虚拟地址 |
+| 常见设备 | 传统 PC 外设 | PCIe、显卡、NVMe、网卡 |
 
-## 原始行 1135-1159
+ARM 架构通常不支持传统 I/O 端口访问，主要使用 MMIO。x86 通常两者都支持。
 
-pci桥分透明桥和非透明桥，非透明桥一般用于双处理器直接的数据交换
+## BAR 基础
 
-cat /proc/iomem  # 显示所有内存映射的IO区域
-cat /proc/ioports  # 显示所有IO端口分配
+BAR 用来告诉系统：设备需要一段 I/O 或内存地址空间。系统枚举设备时会分配物理地址，并把结果写入设备配置空间。
 
+示例：
 
-lspci -k 可以查看所有设备对应的驱动程序
+```text
+Region 0: Memory at 81200000 (64-bit, non-prefetchable) [size=16K]
+```
 
-可用的内核参数在目录/proc/sys中
-vi /etc/sysctl.conf
-列
-#禁用包过滤功能
-net.ipv4.ip_forward = 0 
+如果配置空间中 BAR0 低 4 位为 `0x4`：
 
-[root@localhost ~]# lspci -n
-00:00.0 0600: 1d94:1450
-00:01.0 0600: 1d94:1452
-00:01.1 0604: 1d94:1453
-查看pci设备的厂商和设备id号
-lspci -nn
-[root@localhost ~]# lspci -nn
-00:00.0 Host bridge [0600]: Chengdu Haiguang IC Design Co., Ltd. Root Complex [1d94:1450]
-00:01.0 Host bridge [0600]: Chengdu Haiguang IC Design Co., Ltd. PCIe Dummy Host Bridge [1d94:1452]
-查看更具体的设备信息
-lspci -vvv -s 00:1f.4
+```text
+0100b
+```
 
-## 原始行 1189-1265
+| 位 | 含义 |
+| --- | --- |
+| bit 0 = 0 | Memory BAR，不是 I/O BAR |
+| bit 2:1 = 10 | 64 位地址 |
+| bit 3 = 0 | non-prefetchable |
+| bit 4 及以上 | BAR 基地址的一部分 |
 
-arm架构不支持io端口访问,支持mmio访问，x86则都支持
+64 位 BAR 会占用两个 BAR 寄存器，需要把高低部分组合起来看。
 
-[root@localhost 0000:30:00.0]# lspci -vvv -s 30:00.0 |grep -A 5 "Region"
-        Region 0: Memory at 81200000 (64-bit, non-prefetchable) [size=16K]
-lspci查询到的是物理地址，通过下面的lspci -xxx -s也是可以看出的第一个bar就存着物理地址，低四位是对
-地址类型的判断
-BAR0 低4位 = 0x4 = 0100b
+## PCI Bridge 总线号
 
-bit 0 = 0 → 内存空间（非I/O）
-bit 2:1 = 10 → 64位地址空间
-bit 3 = 0 → 非预取内存
-bit 4-31 = 基地址
-[root@localhost 0000:30:00.0]# lspci -xxx -s 30:00.0
-30:00.0 Non-Volatile memory controller: Intel Corporation PCIe Data Center SSD (rev 01)
-00: 86 80 53 09 06 04 10 00 01 02 08 01 10 00 00 00
-10: 04 00 20 81 00 00 00 00 00 00 00 00 00 00 00 00
+| 字段 | 中文 | 含义 |
+| --- | --- | --- |
+| Primary Bus | 主总线 | 桥设备上游总线号 |
+| Secondary Bus | 次级总线 | 桥直接连接的下游总线号 |
+| Subordinate Bus | 从属总线 | 该桥下面所有总线中的最大编号 |
 
-cd /sys/bus/pci/devices/0000:30:00.0
-# 查看致命错误
-cat aer_dev_fatal
+这些字段通常在桥设备配置空间 `0x18`、`0x19`、`0x1a` 附近。
 
-# 查看非致命错误
-cat aer_dev_nonfatal
+路由逻辑：
 
-# 查看可纠正错误
-cat aer_dev_correctable
+- 目标总线小于 Primary：往上游转发。
+- 目标总线等于 Secondary：发到桥直接连接的下游总线。
+- 目标总线大于 Secondary 且小于等于 Subordinate：继续往下游转发。
 
-lspci -vvv -s 30：00.0的AER显示中
-Q：UESta和UESvrt的关系？
+一个桥通常管理一段下游总线范围。系统分配 Bus 号时常按发现桥的顺序深度优先遍历。
 
-UESta置位 (+)   │  ← 记录"发生了什么"
-查询UESvrt      │  ← 判断"有多严重"
-A：
+## 透明桥与非透明桥
 
-UESta是状态寄存器，报告错误是否发生
-UESvrt是配置寄存器，预定义每个错误的严重程度
+- 透明桥：普通 PCIe 拓扑扩展，对系统软件相对透明。
+- 非透明桥：常用于两个处理器或两个系统之间的数据交换，两侧地址空间不完全共享。
 
-一个桥能管理多个总线吗？	不能，每个桥只管理一个subordinate bus
+## MSI / MSI-X
 
-概念	中文	数量	含义
-Primary Bus	主总线	1个	桥所在的总线
-Secondary Bus	次级总线	1个	桥直接连接的下级总线
-Subordinate Bus	从属总线	1个	下级总线的最大编号
-在pci配置的0x18 0x19 0x20寄存器的位置
+MSI 是通过内存写操作触发中断的机制，相比传统中断线更适合现代高速 I/O 设备。
 
-作用：PCI事务路由
-- 如果目标总线 < Primary    → 往上游转发
-- 如果目标总线 = Secondary  → 发送到该总线
-- 如果目标总线 > Secondary 且 ≤ Subordinate → 往下游转发
+典型申请流程：
 
-MSI中断申请流程
-1：检查设备是否支持msi
+```c
 if (pci_find_capability(pdev, PCI_CAP_ID_MSI)) {
-    // 设备支持MSI
+    /* 设备支持 MSI */
 }
-// 检查设备是否支持MSI-X
+
 if (pci_find_capability(pdev, PCI_CAP_ID_MSIX)) {
-    // 设备支持MSI-X
+    /* 设备支持 MSI-X */
 }
-2：申请msi中断
-// 申请MSI中断（1-4个向量）
+
 int vectors = pci_alloc_irq_vectors(pdev, 1, 4, PCI_IRQ_ALL_TYPES);
-
-// 获取中断号
 int irq = pci_irq_vector(pdev, 0);
-3：注册中断处理函数
+
 request_irq(irq, my_interrupt_handler, 0, "my_device", dev);
-4：中断处理
-my_interrupt_handler的实现
+```
 
-动作,执行者,目的
-创建 pci_dev,PCI 核心层,在内核软件层面建立该物理设备的抽象对象，存储设备身份信息。
-分配物理 BAR 地址,PCI 核心层,在 PCI 总线地址空间内为设备划拨“地皮”（物理地址区间），并写入设备配置空间。
-开启设备电源与中断,NVMe 驱动,通过 pci_enable_device 激活硬件，使其从低功耗状态唤醒并准备好处理中断。
-虚拟地址映射 (ioremap),NVMe 驱动,将分配好的物理 BAR 地址映射到内核虚拟地址空间，使驱动能通过指针读写 SSD 寄存器。
+## AER 错误信息
 
-先把第一个桥的整棵子树（包括子桥、孙桥）全分配完，再回头分配第二个桥的子树。 这是深度优先遍历，Bus号是按发现Bridge的先后顺序递增的，不是按层级分配的。
+PCIe AER 常见 sysfs 文件：
 
+```bash
+cd /sys/bus/pci/devices/0000:30:00.0
+cat aer_dev_fatal
+cat aer_dev_nonfatal
+cat aer_dev_correctable
+```
+
+| 字段 | 含义 |
+| --- | --- |
+| `UESta` | Uncorrectable Error Status，记录发生了什么错误 |
+| `UESvrt` | Uncorrectable Error Severity，配置每类错误的严重程度 |
+
+简单理解：`UESta` 看“有没有发生”，`UESvrt` 看“发生后算多严重”。
+
+## Linux 驱动中的 I/O 端口访问
+
+操作 I/O 端口通常遵循：
+
+1. 申请端口：`request_region`。
+2. 访问端口：`inb`、`outb` 等。
+3. 释放端口：`release_region`。
+
+申请成功后，区域通常能在 `/proc/ioports` 中看到。
+
+## PCIe 设备初始化大致流程
+
+| 动作 | 执行者 | 目的 |
+| --- | --- | --- |
+| 创建设备对象 `pci_dev` | PCI 核心层 | 在内核中建立物理设备的软件抽象 |
+| 分配 BAR 物理地址 | PCI 核心层 | 给设备划分地址空间，并写入配置空间 |
+| 使能设备 | 设备驱动 | `pci_enable_device`，让硬件准备工作 |
+| 映射虚拟地址 | 设备驱动 | `ioremap` 或相关接口，方便访问寄存器 |
+| 申请中断 | 设备驱动 | 注册中断处理函数 |
+| 正常收发或控制 | 设备驱动 | 读写寄存器、处理数据和事件 |

@@ -1,110 +1,163 @@
-﻿# Shell 脚本常用写法
+# Shell 脚本常用写法
 
-> 从 `0_知识大杂烩` 原始备份按行号整理，内容未做语义改写。
+这份笔记整理 Bash 中最常用的语法和容易出错的点。
 
-## 原始行 56-141
+## 变量与特殊参数
 
-1.2 常用shell脚本命令
-1)	cat phonenum.txt |sort -u|wc -l
-sort -u 的作用是剔除相同行，wc -l是计算行数
-2)	若直接换行直接输入echo即可，不需要后面添加内容，可以自动换行
-3)	read ip user < 1.txt
-1.txt的内容是 10.1.1.1 hby 
-echo $ip 就是10.1.1.1
-4)	./1.sh & 放到后台运行
-5)	echo -n "hello world" 不换行打印 
-6)	ping -c1 $ip.$i $>/dev/null 可以有这样的写法
-7)	shell界面写true，接下里echo $?就打印0 写false就打印1
-8)	head -3 phonenum.txt 打印phonenum.txt 的前3行
-head -3 phonenum.txt |tail -1 
-tail -1的作用就是打印下面的一行，所以上面的命令就可以筛选第三行
-9)	echo $RANDOM 打印一个随机数
-10))	time ./shezhimima.sh 查看脚本运行时间
-11)	echo 123456|passwd --stdin stu01 给一个用户设置密码
-12)	创建一个组 groupadd class 创建一个用户useradd u1p
-13)	往一个组里添加用户 useradd -G class u1 往clas这个组里添加u1这个用户
-14)	查看用户组 cat /etc/group 查看用户 cat /etc/passwd
-15)	for i in {2..22} 写法正确，for i in{2..$val} 写法错误，因为for中只能指定确定的数值
-16)	touch file{5..8} 可以创建file5到file8之间包括自身的所有文件	
-17)	[ -s file5 ]  ||  echo hby 在终端可以这样使用
-18)	if [ $(($i%2)) -eq 0 ]; then
-$[$i%2] 引用变量必须这样写
-注：if后面有空格，中括号两边有空格
-$() 和` `效果一样
-19)	for i in $(seq 2 $[$val-1]) 等价于 for i in `seq 2 $[$val-1]`
-20)	if 和elif后面需空格
-21)	echo 1 >> 1.txt 会直接创建1.txt文件
-22)	记得if[  ] 判断的时候只有一个等号
-23)	[ !-d ./dir1 ]; 判断一个文件不是目录
-24)	[ file -ef file2 ];echo $? 比较两个文件是否一致，也就是他们的id号是否一致，内容一致id号也会不一致
-25)	let n=n**3 计算一个数的幂值
-26)	echo $$ ？？？  echo $$  返回登录shell的PID
-27)	ln -s file1 test1   if[ -L ./test1 ];echo $? 0 判断是不是一个链接文件
-28)	test -r i2cdetect;echo $? 判断icdetect文件是不是可读的l
-29)	-s是判断文件是否不为空，！-s判断文件是否为空文件，要和字符串的-z     和-n区分开
-30)	test -z "hello";echo $? 前面为空就会打印0,echo &?假就是1所以打印的是1，-z 就是空就是1，非空就是0，所以test –z “hello” 执行的结果就是0，但是echo $?结果0打印就是1
-32)	echo $(( 256*22 ))等价于echo $[ 256*22 ]
-33)	-e	判断文件是否存在（link文件指向的也必须存在）	exists
-34)	-f	判断文件是否存在并且是一个普通文件	file
-35)	 [ -d  ./file1 ];echo $? 如果是目录文件在就会打印0，但是是文件的话就打印别的数字
-36)	ll -i 可以显示inode号
-37)	$0 当前执行脚本的名字，$1 当前执行脚本的第一个参数一次类推，$* 脚本输入的所有的参数和$@一样
-38)	echo $?查看上一次的shell命令有无执行成功，成功的话就会显示0，没有成功就会显示别的数字
-39)	ccc=itcast export ccc 等价于export ccc=itcast 和declare -x 定义一个环境变量和export一样
-40)	/etc/profile 全局环境变量信息
-41)	env 查看当前用户的环境变量
-42)	declare -r B=111  定义B只读
-43)	双引号可以引用变量
-44)	read -p "Input": ip < ip.txt 把ip.txt的内容当作密码输入给ip
-45)	B=$(uname -r)等同于b=`uname -r`
-46)	echo ${A:2:3} 截取第2个字符的后面三个
-47)	read -t 3 -p "input": name 限制输入三秒
-48)	read -n 5 -p "INput your name": name 限制输入个数
-49)	read -s -p "Input your name  " pass 隐藏密码
-50)	read -p "Input your name" name 输出相应提示
-51)	unset取消变量
-52)	bash -x 25.sh 查看脚本调试过程
-53)	bash -n  查看脚本语法有误错误
-54)	cat phonenum.txt |sort -u|wc –l  sort -u 的作用是剔除相同行，wc -l是计算行数
-55)	grep -v 就是反向查找，查找不含后续字段的行
-56)	grep -w 就是精准查找，默认只匹配一个单词
-57)	shell中if[-z]就是后面是数据是空的它就是真的，就成立
-58)	awk -F 后面加一个.就是指定了分隔符
-59)	awk {print $2} 就是一行行读取文件，以空格为分割符，打印第二个字段
-60)	modprobe命令用于智能地向内核中加载模块或者从内核中移除模块
-61)	depmod -a
-这个命令一般放在make modules_install之后。depmod可检测模块的相依性，供modprobe在安装模块时使用。
-62)	ggYG复制全部
-63)	数组有两种定义的方式一种是单个单个定义
+| 写法 | 含义 |
+| --- | --- |
+| `$0` | 当前脚本名 |
+| `$1`、`$2` | 第 1、第 2 个参数 |
+| `$*` | 所有参数，偏向当作一个整体 |
+| `$@` | 所有参数，偏向保留每个参数边界 |
+| `$?` | 上一条命令的退出状态，成功通常为 `0` |
+| `$$` | 当前 Shell 进程 PID |
+| `$RANDOM` | 随机数 |
+| `B=$(uname -r)` | 命令替换，推荐写法 |
+| `B=\`uname -r\`` | 命令替换，老写法 |
+| `unset name` | 删除变量 |
+| `declare -r B=111` | 定义只读变量 |
+| `export ccc=itcast` | 定义环境变量，传给子进程 |
+
+```bash
+A="abcdef"
+echo "${A:2:3}"   # 从下标 2 开始取 3 个字符，输出 cde
+```
+
+## 输入、输出与重定向
+
+| 写法 | 用途 |
+| --- | --- |
+| `echo` | 输出空行 |
+| `echo -n "hello"` | 输出但不换行 |
+| `echo 1 >> 1.txt` | 追加写入，文件不存在会创建 |
+| `read ip user < 1.txt` | 从文件读取两个字段到变量 |
+| `read -p "Input: " name` | 带提示读取输入 |
+| `read -t 3 -p "Input: " name` | 限制 3 秒输入 |
+| `read -n 5 -p "Input: " name` | 限制输入 5 个字符 |
+| `read -s -p "Password: " pass` | 隐藏输入，适合密码 |
+| `./1.sh &` | 后台运行脚本 |
+
+```bash
+ping -c1 "$ip.$i" >/dev/null
+echo $?   # 查看 ping 是否成功
+```
+
+## 判断条件
+
+`if` 后要有空格，`[` 和 `]` 两侧也要有空格。
+
+```bash
+if [ "$name" = "hby" ]; then
+    echo "matched"
+elif [ -z "$name" ]; then
+    echo "empty"
+fi
+```
+
+| 条件 | 含义 |
+| --- | --- |
+| `[ -e file ]` | 文件存在 |
+| `[ -f file ]` | 存在且是普通文件 |
+| `[ -d dir ]` | 存在且是目录 |
+| `[ ! -d dir ]` | 不是目录或目录不存在 |
+| `[ -s file ]` | 文件存在且非空 |
+| `[ -z "$str" ]` | 字符串为空 |
+| `[ -n "$str" ]` | 字符串非空 |
+| `[ -L link ]` | 是符号链接 |
+| `test -r file` | 文件可读 |
+| `[ file1 -ef file2 ]` | 两个路径是否指向同一个 inode |
+
+## 算术
+
+```bash
+echo $((256 * 22))
+echo $[256 * 22]       # 老写法，不推荐新脚本继续用
+let n=n**3
+
+if [ $((i % 2)) -eq 0 ]; then
+    echo "even"
+fi
+```
+
+## 循环
+
+大括号展开只能写确定范围，不能直接写变量范围。
+
+```bash
+for i in {2..22}; do
+    echo "$i"
+done
+
+for i in $(seq 2 "$((val - 1))"); do
+    echo "$i"
+done
+
+for letter in {a..z}; do
+    dd if="/dev/sda${letter}" of=/dev/null bs=512k count=200 iflag=direct >/tmp/ddresult_devsda${letter}
+    echo "$letter"
+done
+```
+
+## 数组
+
+```bash
 array[0]=hby
 array[1]=harry
-还有一种是整体定义
-arry={5 6 7}
-获取数组的第一个元素是
-echo ${array[0]}
-获取数组的所有元素
-echo ${array[*]}
-获取数据所有元素的个数
-echo ${#array[*]}
-echo ${arry[*]:1:3} 打印这个数组下标为1后的三个元素
-64)	source和./执行脚本的区别？？？
-65)	grep -s 选项表示不显示不存在或无匹配文本的错误信息
-66)	sed -n 4p打印第四行
 
-## 原始行 231-244
+nums=(5 6 7)
 
-2.3.5 常用的shell结构
-2.3.5.1 for循环
-1.for letter in {a..z}; 
-2.do
-3.        dd if=/dev/sda$letter of=/dev/null bs=512k count=200 iflag=direct >/tmp/ddresult_devsday
-4.        echo $letter
-5.done 
-6.
+echo "${array[0]}"       # 第一个元素
+echo "${array[*]}"       # 所有元素
+echo "${#array[*]}"      # 元素个数
+echo "${nums[*]:1:3}"    # 从下标 1 开始取 3 个元素
+```
 
+## 文本处理
 
+| 命令 | 用途 |
+| --- | --- |
+| `sort -u phonenum.txt | wc -l` | 去重后统计行数 |
+| `head -3 phonenum.txt | tail -1` | 取第 3 行 |
+| `grep -v xxx file` | 反向查找，不包含 `xxx` 的行 |
+| `grep -w xxx file` | 精准匹配单词 |
+| `grep -s xxx file` | 不显示不存在或无匹配的错误信息 |
+| `awk -F '.' '{print $2}' file` | 指定 `.` 为分隔符，打印第 2 列 |
+| `awk '{print $2}' file` | 默认按空白分隔，打印第 2 列 |
+| `sed -n '4p' file` | 打印第 4 行 |
 
+## 用户、组与模块
 
+```bash
+groupadd class
+useradd u1
+useradd -G class u1
 
+cat /etc/group
+cat /etc/passwd
 
+echo 123456 | passwd --stdin stu01
 
+modprobe i2c-i801
+depmod -a
+```
+
+`depmod -a` 一般放在 `make modules_install` 之后，用来生成模块依赖信息，供 `modprobe` 使用。
+
+## 调试脚本
+
+| 命令 | 用途 |
+| --- | --- |
+| `bash -n 25.sh` | 只检查语法，不执行 |
+| `bash -x 25.sh` | 打印执行过程，方便调试 |
+| `time ./script.sh` | 查看脚本运行时间 |
+| `source ./script.sh` | 在当前 Shell 执行，变量会影响当前环境 |
+| `./script.sh` | 开子 Shell 执行，变量通常不影响当前环境 |
+
+## 易错点
+
+- `[ ! -d ./dir1 ]` 中 `!` 后面要有空格。
+- 字符串比较常用一个等号：`[ "$a" = "$b" ]`。
+- `$?` 表示退出状态，`0` 通常是真成功，非 `0` 通常是失败。
+- `>` 会覆盖文件，`>>` 会追加文件。
+- 双引号可以引用变量，也能避免变量为空或包含空格时把命令拆坏。
