@@ -5,7 +5,7 @@
             "created": 1767061125837,
             "text": "acpi_init",
             "priority": 1,
-            "font-family": "¿¬Ìå,¿¬Ìå_GB2312,SimKai"
+            "font-family": "æ¥·ä½“,æ¥·ä½“_GB2312,SimKai"
         },
         "children": [
             {
@@ -189,7 +189,7 @@
                                                                                                         "data": {
                                                                                                             "id": "dfh558u89ds0",
                                                                                                             "created": 1767665562426,
-                                                                                                            "text": "pci_read_bridge_io?pci_info(dev, \"  bridge window %pR\n\", res);?"
+                                                                                                            "text": "pci_read_bridge_io?pci_info(dev, \"?bridge window %pR\n\", res);?"
                                                                                                         },
                                                                                                         "children": []
                                                                                                     }
