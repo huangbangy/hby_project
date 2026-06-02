@@ -1,0 +1,607 @@
+将 SCSI 主机添加到 sysfs 是一个重要的步骤，因为它允许用户通过文件系统接口查看和管理 SCSI 主机的信息。
+sysfs 是一个虚拟文件系统，提供了一种结构化的方式来访问内核对象及其属性。以下是如何在系统中查看 SCSI 主机在 sysfs 中的表示。
+
+我们是mpt2sas对应2008，3sas对应3008，35sas对应3408和3808
+
+4个phy组成一个宽端口
+
+{0，0，0，0}由四部分组成
+disk_loc.adapter disk_loc.port disk_loc.enclosure disk_loc.slot
+
+struct disk_location {
+    u32 adapter;    // 适配器编号
+    u32 port;       // 端口号
+    u32 enclosure;  // 扩展柜编号
+    u32 slot;       // 插槽编号
+};
+
+下发上下电是disk下发的，且给deu方式的下发是下发ses page页的方式下发的
+
+驱动层通过接口通知disk层发生事件，如下电等操作
+
+lsscsi列出所有的scsi设备
+
+deu_mgt_get_notify_from_driver  sas模块和deu模块的接口
+
+list_add_tail(&notify_events->list, &deumgt_p->notify_queue);
+增加事件
+
+
+怎么看enclosure logical id(0x548ea001a223403f),这些sas地址是属于控制器的还是sas盘的
+notify_process_events处理如下上报的事件
+{
+    enum notify_type
+{
+  DEU_INS_SMP,
+  DEU_INS_SES,
+  DEU_INS_DISK,
+  DEU_DEL_SMP,
+  DEU_DEL_SES,
+  DEU_DEL_DISK,
+  DEU_POWEROFFON_DISK,
+  DEU_POWEROFF_DISK,
+  DEU_POWEROFF_FAULT_DISK,   //SAD36775
+  DEU_INS_NVME,
+  DEU_DEL_NVME,
+  MAX_NOTIFY,
+}
+
+_scsi_add_device 函数负责向系统中添加 SAS 设备，包括读取设备配置页、检查设备状态、处理特定产品需求、
+初始化设备结构体以及将设备添加到系统中。通过详细的步骤和错误处理机制，确保设备能够正确地被识别和管理。
+比如上下电五次不成功就给它下电点黄灯
+{
+[root@localhost-0 ~]# cli
+<Storage>disk display list
+Disk(s):12
+Disk 1:
+  1,0,0,1 - I/F Type: SATA Capacity: 480 GB/447 GiB Serial No: PHYG120200L1480BGN
+Disk 2:
+  1,0,0,3 - I/F Type: SATA Capacity: 3.00 TB/2.73 TiB Serial No: Z3046599
+Disk 3: 
+  1,0,0,7 - I/F Type: SATA Capacity: 4.00 TB/3.64 TiB Serial No: Z4F00P7A
+Disk 4:
+  1,0,0,13 - I/F Type: SATA Capacity: 1.00 TB/932 GiB Serial No: WD-WMATV0872146
+Disk 5:
+  1,0,0,15 - I/F Type: SATA Capacity: 1.00 TB/932 GiB Serial No: WD-WMATV43   
+Disk 6:
+  1,0,0,19 - I/F Type: SATA Capacity: 180 GB/168 GiB Serial No: CVKI316103UL180CGN
+Disk 7:
+  1,0,0,21 - I/F Type: SATA Capacity: 2.00 TB/1.82 TiB Serial No: WD-WCC4M6YRK9X6
+Disk 8:
+  1,0,1,3 - I/F Type: SATA Capacity: 1.00 TB/932 GiB S
+Disk 9:
+  1,0,1,7 - I/F Type: SATA Capacity: 4.00 TB/3.64 TiB Serial No: WD-WX62D40A9T0J
+Disk 10:
+  1,0,1,13 - I/F Type: SATA Capacity: 3.00 TB/2.73 TiB Serial No: WD-WMC1T4328240
+Disk 11:
+  1,0,1,15 - I/F Type: SATA Capacity: 6.00 TB/5.46 TiB Serial No: K1G31G5B
+Disk 12:
+  1,0,1,19 - I/F Type: SATA Capacity: 180 GB/168 GiB Serial No: CVKI316102WG180CGN
+}
+{
+[root@localhost-0 ~]# lsscsi
+[5:0:0:0]    disk    ATA      TS32GMTS400      5CH1  /dev/sda
+[7:0:1:0]    disk    ATA      ST3000VX002-1F41 CV13  /dev/sdc
+[7:0:2:0]    disk    ATA      ST4000NM0024-1HT SN02  /dev/sdd
+[7:0:3:0]    disk    ATA      W  DC WD1002FBYS-0 0C05  /dev/sde
+[7:0:4:0]    disk    ATA      WDC WD1002FBYS-0 0C06  /dev/sdf
+[7:0:6:0]    disk    ATA      WDC WD20PURX-64P 0A80  /dev/sdh  
+[7:0:7:0]    enclosu LSIexp   35x36r           0640  -
+[7:0:8:0]    disk    ATA      ST31000525SV     CV12  /dev/sdi
+[7:0:9:0]    disk    ATA      WDC WD40PURX-64A 0A80  /dev/sdj
+[7:0:10:0]   disk    ATA      WDC WD30EURS-63S 0A80  /dev/sdk
+[7:0:11:0]   disk    ATA      WDC WD6002FRYZ-0 1M02  /dev/sdl
+[7:0:14:0]   enclosu LSIexp   35x36r           0640  -
+[7:0:16:0]   disk    ATA      INTEL SSDSC2CT18 335u  /dev/sdb
+[7:0:17:0]   disk    ATA      INTEL SSDSC2KG48 0132  /dev/sdg
+[7:0:19:0]   disk    ATA      INTEL SSDSC2CT18 335u  /dev/sdm
+}
+
+cli上电日志打印
+{
+Jan 10 17:02:29 localhost-0 root: hby
+Jan 10 17:02:39 localhost-0 kernel: [DISK_PD_CMD_ERR] no disk associated with Slot 1:0:0:3 in system
+Jan 10 17:02:39 localhost-0 kernel: [DISK_PD_CMD_INFO] Set disk[1,0,0,3] power on
+Jan 10 17:02:39 localhost-0 kernel: [DISK_PD_CMD_INFO] Sas enclosure loc[1,0,0,3],power on, ret:0
+Jan 10 17:02:39 localhost-0 kernel: [DISK_PD_CMD_INFO] Disk[1,0,0,3] power on successfully
+Jan 10 17:02:40 localhost-0 kernel: [DISK_DEU_INFO] Exp event:Storware set disk power on,DEU[1,0,0],MID[2],Type[2],Event[8],Loc[3],ID[7],Time(10ms)[456518],Value1[0x0],Value2[0x0]
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: sas discovery event: (start)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:41 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:41 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(21), attached_handle(0x 0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+
+Jan 10 17:02:41 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+printk("MPT3SAS add device start: handle(0x%04x),phy(%d)\n",handle,sas_device_pg0.PhyNum);
+
+*1A）Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+printk(MPT3SAS_INFO_FMT "detecting: handle(0x%04x), ""sas_address(0x%016llx), phy(%d)\n", ioc->name, handle,
+
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(retry_ua)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x06,0x29,0x01]
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+*1B）Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:41 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(25), count(11) （SAS 扩展器设备的句柄（handle），SAS 扩展器设备的机箱（enclosure）的句柄，拓扑变化开始的物理端口编号，拓扑变化涉及的物理端口数量）
+}Jan 10 17:02:41 localhost-0 kernel:     phy(25), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(26), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(27), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(28), attached_handle(0x0011): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(29), attached_handle(0x0011): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(30), attached_handle(0x0011): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:41 localhost-0 kernel:     phy(31), attached_handle(0x0011): target responding: link rate: new(0x0b), old(0x00)
+*1C）Jan 10 17:02:41 localhost-0 kernel: mpt3sas_cm0: sas discovery event: (stop)
+Jan 10 17:02:42 localhost-0 kernel: [DISK_DEU_INFO] Exp event:Phy change,DEU[1,0,0],MID[10],Type[3],Event[17],Loc[3],ID[1],Time(10ms)[456615],Value1[0x0],Value2[0x0]
+Jan 10 17:02:42 localhost-0 kernel: [DISK_DEU_INFO] Exp event:PHY warning: DEU[1,0,0],PHY[3], idw[0],dp[0],dl[0],rstf[0],pch[2], cv(pe)[0],dp(cv)[0]
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:42 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:42 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:42 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:42 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:42 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:42 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:42 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:42 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:42 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+Jan 10 17:02:42 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:43 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:43 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:43 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:43 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:43 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:43 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:43 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:43 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:43 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+Jan 10 17:02:43 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:44 localhost-0 kernel: [DISK_DEU_INFO] Exp event:Phy change,DEU[1,0,0],MID[10],Type[3],Event[17],Loc[3],ID[1],Time(10ms)[456815],Value1[0x0],Value2[0x1]
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003) responding
+Jan 10 17:02:44 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:44 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:44 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:44 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:44 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:44 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:44 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:44 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:44 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0:START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:44localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+Jan 10 17:02:44 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:45 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:45 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:45 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:45 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:45 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:45 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:45 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:45 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:45 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0:START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+Jan 10 17:02:45 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name( )
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:46 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:46 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:46 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:46 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:46 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:46 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:46 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:46 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:46 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0:REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+Jan 10 17:02:46 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:47 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:47 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:47 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:47 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:47 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:47 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:47 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:47 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+Jan 10 17:02:47 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name( )
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:48 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:48 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:48 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:48 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:48 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:48 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:48 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:48 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:48 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+Jan 10 17:02:48 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:49 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:49 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:49 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:49 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:49 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:49 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:49 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:49 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:49 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0:REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+Jan 10 17:02:49 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:50 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:50 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:50 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:50 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:50 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:50 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:50 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:50 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:50 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+Jan 10 17:02:50 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:51 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:51 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:51 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:51 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:51 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:51 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:51 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:51 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:51 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+Jan 10 17:02:51 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:52 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:52 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:52 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:52 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:52 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:52 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:52 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:52 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:52 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+Jan 10 17:02:52 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:53 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:53 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:53 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:53 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:53 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:53 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:53 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:53 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:53 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x0
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0000), loginfo(0x00000000), scsi_status(0x02), scsi_state(0x01), rc(start_unit)
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0:        [sense_key,asc,ascq]: [0x02,0x04,0x01]
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: slot(3)
+Jan 10 17:02:53 localhost-0 kernel: mpt3sas_cm0: _scsih_add_device: device not ready: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0: sas topology change: code(0x0003)  responding
+Jan 10 17:02:54 localhost-0 kernel:     handle(0x0009), enclosure_handle(0x0002) start_phy(03), count(22)
+Jan 10 17:02:54 localhost-0 kernel:     phy(03), attached_handle(0x000b): target add: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:54 localhost-0 kernel:     phy(07), attached_handle(0x000c): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:54 localhost-0 kernel:     phy(13), attached_handle(0x000d): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:54 localhost-0 kernel:     phy(15), attached_handle(0x000e): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:54 localhost-0 kernel:     phy(19), attached_handle(0x000f): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:54 localhost-0 kernel:     phy(21), attached_handle(0x0010): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:54 localhost-0 kernel:     phy(24), attached_handle(0x0001): target responding: link rate: new(0x0b), old(0x00)
+Jan 10 17:02:54 localhost-0 kernel: MPT3SAS add device start: handle(0x000b),phy(3)
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0: detecting: handle(0x000b), sas_address(0x548ea634bd4c0001), phy(3)
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0: START_UNIT: handle(0x000b), lun(0)
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0: REPORT_LUNS: handle(0x000b), retries(0)
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0: TEST_UNIT_READY: handle(0x000b), lun(0)
+*1D）Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0: ATA_IDENTIFY:handle(0x000b)
+Jan 10 17:02:54 localhost-0 kernel: security is disable
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0: _scsih_sas_device_add: handle(0x000b), sas_addr(0x548ea634bd4c0001)
+*1E）Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0: enclosure logical id(0x548ea001a223403f), slot(3)
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0: enclosure level(0x0000),connector name(     )
+*1F）Jan 10 17:02:54 localhost-0 kernel: mpt3sas parphy_id = 0 attached_handle =9 remote_sas_address:0x548ea001a223403f
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas parphy_id = 0 *sas_port_id=0
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas LSI_SAS adapter cnt:1
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas 3008adapter No:1
+*1G）Jan 10 17:02:54 localhost-0 kernel: [DISK_DEU_INFO] Exp Event:Insert disk,type:SAS,Adaptor:1,Channel:0,Slot:3,parent_sas:0x548ea001a223403f,attach_sas:0x548ea634bd4c0001
+Jan 10 17:02:54 localhost-0 kernel: scsi 7:0:15:0: Direct-Access     ATA      ST3000VX002-1F41 CV13 PQ: 0 ANSI: 5
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas  _scsih_determine_disposition transfer_packet->ioc_status=0x45
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas_cm0:        ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready)
+Jan 10 17:02:54 localhost-0 kernel: scsi 7:0:15:0: SSP: handle(0x000b), sas_addr(0x548ea634bd4c0001), phy(3), device_name(0x0000000000000000)
+Jan 10 17:02:54 localhost-0 kernel: scsi 7:0:15:0: enclosure logical id(0x548ea001a223403f), slot(3)
+Jan 10 17:02:54 localhost-0 kernel: scsi 7:0:15:0: enclosure level(0x0000), connector name(     )
+Jan 10 17:02:54 localhost-0 kernel: scsi 7:0:15:0: serial_number(            Z3046599)
+Jan 10 17:02:54 localhost-0 kernel: scsi 7:0:15:0: Attached scsi generic sg1 type 0
+Jan 10 17:02:54 localhost-0 kernel: [759944]: scst: scst_register_device:1097:Attached to scsi7, channel 0, id 15, lun 0, type 0
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas parphy_id = 0 attached_handle =9 remote_sas_address:0x548ea001a223403f
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas parphy_id = 0 *sas_port_id=0
+Jan 10 17:02:54 localhost-0 kernel: mpt3sas LSI_SAS adapter cnt:1
+*1H）Jan 10 17:02:54 localhost-0 kernel: mpt3sas 3008adapter No:1
+*1I）Jan 10 17:02:54 localhost-0 kernel: [DISK_DEU_INFO] receive driver notify, id:2, parent_sas:0x548ea001a223403f, attach_sas:0x548ea634bd4c0001
+Jan 10 17:02:54 localhost-0 kernel: [DISK_DEU_INFO] Exp Event:Insert disk,type:SAS,ACSL[7:0:15:0],Adaptor:1,Channel:0,Slot:3,parent_sas:0x548ea001a223403f,attach_sas:0x548ea634bd4c0001
+Jan 10 17:02:54 localhost-0 kernel: sd 7:0:15:0: [sdb] 5860533168 512-byte logical blocks: (3.00 TB/2.73 TiB)
+Jan 10 17:02:54 localhost-0 kernel: sd 7:0:15:0: [sdb] 4096-byte physical blocks
+Jan 10 17:02:54 localhost-0 kernel: sd 7:0:15:0: [sdb] Write Protect is off
+*1J)Jan 10 17:02:54 localhost-0 kernel: [DISK_PD_CMD_INFO] Disk set port ready led meaning
+*1K)Jan 10 17:02:54 localhost-0 kernel: [DISK_PD_CMD_INFO] Disk set cache rcache:enable,wcache:disable, ACSL[7:0:15:0], ret:0
+*1L)Jan 10 17:02:54 localhost-0 kernel: [DISK_DEU_INFO] drv notify add disk,ACSL[7:0:15:0],LOC:[1,0,0,3]
+Jan 10 17:02:54 localhost-0 kernel: [DISK_PD_CMD_INFO] set loc[1,0,0,3],led status:Normal
+Jan 10 17:02:54 localhost-0 kernel: sd 7:0:15:0: [sdb] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+Jan 10 17:02:54 localhost-0 kernel: sd 7:0:15:0: [sdb] Attached SCSI disk
+Jan 10 17:02:55 localhost-0 kernel: [DISK_PD_CMD_INFO] set loc[1,0,0,3],led status:Normal
+Jan 10 17:02:55 localhost-0 kernel: [DISK_COMM_INFO] disk loc[1,0,0,3],sync led set success
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Begin to handle disk add messege:SATA disk with SCSI device:[7:0:15:0]. Location:[1,0,0,3],
+*1M)Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Wcache has disabled. disk with SCSI device:[7:0:15:0]. Location:[1,0,0,3], queue_flags:20d24494
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Does not found the PD by sn [Z3046599].
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Disk in scsi_id[7, 0, 15, 0] open device 8:16
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Read vender of PD[-1,Z3046599,5860533168,{1,0,0,3}].
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] PD[-1,Z3046599,5860533168,{1,0,0,3}]
+Jan 10 17:02:58 localhost-0 kernel: [PD_INFO] The pd version set to V2.  Location:[1,0,0,3], SN:Z3046599, ID:-1
+*1N)Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Add v2 pd into map. Location:[1,0,0,3], SN:Z3046599, ID:0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] disk_err_p is null
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] smart Enabled/Disabled  Status:Enabled
+*1O)Jan 10 17:02:58 localhost-0 kernel: cfs_enable value:0x13385
+Jan 10 17:02:58 localhost-0 kernel: cfs value:0x73
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_CMD_INFO] set loc[1,0,0,3],led status:Normal
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] handle SATA disk add messege success set default led,LOC:[1,0,0,3]
+Jan 10 17:02:58 localhost-0 kernel: [DISK_FSM_INFO] fsm(pd_fsm{7,0,15,0}): state Initializing event Add disk
+*1P)Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] SATA Disk associated with SCSI device:[7:0:15:0].  Location:[1,0,0,3], SN:Z3046599, ID:0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_CHECK_INFO] get disk error message is null.
+Jan 10 17:02:58 localhost-0 kernel: Storage::1736499778::I::DISK::2025/01/10::17:02:58::0x1054501::Disk{1,0,0,3} inserted
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] Header signature is invalid. Except: 11111111, Actual: 0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] ddf is invalid!
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] <DDF---HEADER>  signature: 0x0; crc: 0x0; lun_section_state: 0x0; sequence num: 0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] <DDF---RG>signature: 0x0;crc: 0x0;raid_group_uuid: 0-0-0-0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] raid_group_name: ; raid_type: 0x0;full_disk_num: 0x0 spare_disk_num: 0x0 ;capacity: 0x0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] <DDF---PD>signature: 0x0; crc: 0x0 ;in_raid_group:0x0; max_disk_num:0x0 ;current_disk_num:0x0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] disk_sn: ; disk_type: 0x0,disk_index: (0x0) swap_disk_idx:(0x0) disk_state:(0x0)  usable_size: (0x0)
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] dds_scan_read slow disk switch:1, pd->__serial_no:Z3046599
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] Header signature is invalid. Except: 11111111, Actual: 0
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] ddf is invalid!
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] dds_scan_read slow disk switch:1, pd->__serial_no:Z3046599
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] Pri and sec ddf are both ni_err. pd sn: Z3046599
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] Set pd role, old role:N/A, new role:Vacant, loc:{1,0,0,3},pd:Z3046599.
+*1Q）Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_ERR] pd[1,0,0,3] dds_node need_delete!
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] pd [1,0,0,3] has been finish dds scan, but need delete dds_node
+Jan 10 17:02:58 localhost-0 kernel: [DISK_DDF_INFO] pd[1,0,0,3] dds_node delete finish!
+*1R）Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_INFO] scsi qw process scsi add msg
+Jan 10 17:02:58 localhost-0 kernel: [DISK_PD_CMD_INFO] set loc[1,0,0,3],led status:Normal
+Jan 10 17:02:58 localhost-0 kernel: [DISK_COMM_INFO] disk loc[1,0,0,3],sync led set success
+Jan 10 17:02:58 localhost-0 kernel: [DISK_COMM_INFO] receive power sleep timer install msg
+
+cli上电流程
+{
+    判断deu类型
+    sas deu类型的下发page页
+    poll_edge_log deu的日志轮询
+    _mpt3sas_fw_work->_scsih_sas_discovery_event 发现事件发现磁盘
+    _mpt3sas_fw_work->_scsih_sas_discovery_event->_scsih_sas_host_add（磁盘上线为0的时候给它执行这个函数分配的，中途上电不走此分支）
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
+*1A）    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device (包括磁盘未准备就绪时我司做的上下电处理_lsi_sasdrv_dev_poweroffon)
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_start_unit
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_report_luns->_scsih_determine_disposition(解析 ioc_status 和 scsi_state: 根据这些字段确定设备的状态和处理建议,retry四次，ready时退出)
+*1B）  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug （SAS 扩展器设备的句柄（handle），SAS 扩展器设备的机箱（enclosure）的句柄，拓扑变化开始的物理端口编号，拓扑变化涉及的物理端口数量）
+*1C） _mpt3sas_fw_work->_scsih_sas_discovery_event->_scsih_sas_discovery_event 发现事件发现磁盘
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_sas_topology_change_event_debug(句柄,速率 )
+    poll_edge_log deu的日志轮询
+*1D）    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_check_disable_security->_scsih_ata16_identify
+*1E）  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->_scsih_display_enclosure_chassis_info
+*1F）_mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->_lsi_vx3000E_sasdrv_port_get（获取磁盘所在的SAS端口号）
+  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->lsi_3008adapter_num_get
+  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->deu_mgt_get_notify_from_driver
+*1G） disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify
+  scsi内核打印日志
+    _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_wait_for_target_to_become_ready->_scsih_report_luns->_scsih_determine_disposition
+*1H）  _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->mpt3sas_transport_port_add->_lsi_sasdrv_dev_add->lsi_3008adapter_num_get
+*1I) _mpt3sas_fw_work->_scsih_sas_topology_change_event ->_scsih_check_device ->_scsih_add_device->_scsih_sas_device_add->deu_mgt_get_notify_from_driver
+*1J)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_set_ready_led_meaning(SCSI 命令设置或清除 SCSI 设备的端口就绪 LED 的含义)
+*1K)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_set_cache->disk_set_sas_cache
+*1L)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_queue_work->disk_delay_work->disk_set_led
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->disk_queue_work->disk_delay_work
+disk_init->disk_comm_init->disk_msg_requestproc->disk_msg_set_led
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata
+*1M)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->disk_wait_wcache_close
+pdi_get_by_sn
+pdi_new->pdi_open
+pdi_new->pdi_ddf_read_vendor
+*1N)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->common_pd_scan_anchor_and_to_map
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->sata_smart_enable(打开磁盘的smart信息查询)
+*1O)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->disk_get_cache->disk_get_sata_cache(获取磁盘读写cache的状态)
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->disk_set_led->disk_set_led_local
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata
+*1P)disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata->diskscan_pd_insert
+disk_init->deu_init->deu_notify_queue_proc->deu_mgt_notify->notify_process_events->notify_add_disk->common_pd_msg_add_ata(storage日志显示插入磁盘)
+*1Q）dds_node_delete
+dds_node_unlock_after_disk_scan
+dds_node_delete
+*1R）pd_scsi_queue_proc
+disk_init->disk_comm_init->disk_msg_requestproc->disk_msg_power_sleep_timer_install
+}

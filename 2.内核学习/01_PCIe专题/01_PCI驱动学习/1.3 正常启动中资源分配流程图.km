@@ -1,0 +1,67 @@
+{
+    "root": {
+        "data": {
+            "id": "dfp0pnqia4w0",
+            "created": 1768465536240,
+            "text": "pcibios_assign_resources"
+        },
+        "children": [
+            {
+                "data": {
+                    "id": "dfp0q9676ew0",
+                    "created": 1768465582901,
+                    "text": "pci_assign_unassigned_root_bus_resources"
+                },
+                "children": [
+                    {
+                        "data": {
+                            "id": "dfp0qkenemo0",
+                            "created": 1768465607356,
+                            "text": "__pci_bus_assign_resources"
+                        },
+                        "children": [
+                            {
+                                "data": {
+                                    "id": "dfp0qun2gtk0",
+                                    "created": 1768465629633,
+                                    "text": "__pci_bus_assign_resources"
+                                },
+                                "children": [
+                                    {
+                                        "data": {
+                                            "id": "dfp0rl0ptm80",
+                                            "created": 1768465687055,
+                                            "text": "pci_setup_bridge"
+                                        },
+                                        "children": [
+                                            {
+                                                "data": {
+                                                    "id": "dfp0rtm8qug0",
+                                                    "created": 1768465705771,
+                                                    "text": "__pci_setup_bridge"
+                                                },
+                                                "children": [
+                                                    {
+                                                        "data": {
+                                                            "id": "dfp0rvkr1g80",
+                                                            "created": 1768465710034,
+                                                            "text": "pci_setup_bridge_io"
+                                                        },
+                                                        "children": []
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "template": "structure",
+    "theme": "fresh-blue",
+    "version": "1.4.43"
+}

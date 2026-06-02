@@ -1,0 +1,34 @@
+	printk(MPT3SAS_INFO_FMT "host_add: handle(0x%04x), "
+	    "sas_addr(0x%016llx), phys(%d)\n", ioc->name, ioc->sas_hba.handle,
+	    (unsigned long long) ioc->sas_hba.sas_address,
+	    ioc->sas_hba.num_phys);
+
+这里的num的数目是怎么出来的，与连接的磁盘是否有关        
+
+ar 11 08:01:49 localhost-0 kernel:     handle(0x0000), enclosure_handle(0x0001) start_phy(00), count(4)
+Mar 11 08:01:49 localhost-0 kernel:     phy(00), attached_handle(0x0009): link rate change: link rate: new(0x0b), old(0x00)
+Mar 11 08:01:49 loca
+
+enclosure_handle(0x0001 为什么有的是00001有的是0002
+
+EnclosureHandle 和ExpanderDevHandle 的区别
+
+ ioc_status(0x0045), loginfo(0x00000000), scsi_status(0x00), scsi_state(0x00), rc(ready
+
+
+SMP SES是什么
+ enum notify_type
+{
+  DEU_INS_SMP,
+  DEU_INS_SES,
+  DEU_INS_DISK,
+  DEU_DEL_SMP,
+  DEU_DEL_SES,
+  DEU_DEL_DISK,
+  DEU_POWEROFFON_DISK,
+  DEU_POWEROFF_DISK,
+  DEU_POWEROFF_FAULT_DISK,   //SAD36775
+  DEU_INS_NVME,
+  DEU_DEL_NVME,
+  MAX_NOTI
+

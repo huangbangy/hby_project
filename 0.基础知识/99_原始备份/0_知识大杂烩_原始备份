@@ -1,0 +1,1274 @@
+<!-- markdownlint-disable MD012 -->
+1：常用命令
+1.1	常用linux命令
+1)ll /sys/block | grep usb 看是否插了u盘
+2)grep -v xxx就是查询没有xxx的字段
+3)挂载u盘可以获取里面文件：mount /dev/sda2
+4)卸载用unmount
+5)which kill_monitor.sh 查找.sh脚本在哪
+6)tail -f /var/log/message 从尾部看新增的日志
+7)systemctl reboot 重启，保存文件更安全的重启
+8)tree 可以看目录分支
+9)pstree 可以看进程树
+10)chmod +x * 全部都赋予权限
+11)tar czvf usr.tar.gz /home 把home的全部东西打包压缩
+12)tar xzvf  usr.tar.gz  把usr.tar.gz 解压出来
+13)mpstat 查看cpu利用率
+14)df显示磁盘占用情况
+15)cat /var/log/message 查看日志
+16)du -h --max-depth=1列出目录中文件大小
+17)rm -rf 不做提示删除整个目录
+18)uname -r 找到内核版本
+19)cat /proc/cpuinfo |grep name cpu的类型名字
+20)cat /proc/cpuinfo | grep processor 查看cpu是几核
+21)dmidecode | grep  Size 看内存大小，最下面数据是内存条大小
+22)df –h 可以看文件系统各磁盘使用情况(注：根目录满需注意)
+23)	grep -v  xxx 显示不包含xxx字段的段
+24)	grep -A 10找该查询语句后10条
+25)	cat /var/log/messages |grep -C 5 fault_time 查询fault_time 前五句
+26)	system timer set poweron=22:01 poweroff= 定时关机
+27)du * -sh 看具体文件的大小
+28)	ifup eth0  ifup命令用于激活指定的网络接口。
+29)	lsblk 查看分区挂载情况
+30)	find 和which的区别，find / -name env_config.sh ,which ENVmonitor
+31)find 可以用来查询具体的文件（应该需要加路径），但是which用来查命令
+32)（切记-name 需要加- 不然会去找name这个关键词）
+33)	dd if /dev/zero of = /dev/sdb 往sdb这块硬盘0的东西，看能否写进去
+34)	sed –i ‘s/aaa/bbb’ /home/1.txt 也就是把1.txt里面带有aaa的字眼替换为bbb
+35)	free –h 可以看内存的总数，已经使用的内存数，和完全空闲的内存
+36)	reboot-f 强制重启
+37)date -s 2026-04-14 设置系统时钟
+38)	mkfs.ext4 清空u盘
+39)ls /sys/bus/i2c/devices/ 查看系统上存在的 i2c 总线及其设备地址
+40)	du -h phonenum.txt 查看该文件的大小
+41)	ping -c 10 191.168.25.32 可以ping10次191.168.25.32
+42)	modprobe i2c-i801 加载驱动
+43)	id -u 打印当前的uid号
+44)	环境变量，当前进程和子进程都会生效，但是换用户就不行
+45)	dmidecode -t bios 可以看bios的版本
+46)	setsid命令可以让程序在后台执行
+47)	ldconfig的主要用途：默认搜寻/lilb和/usr/lib，以及配置文件/etc/ld.so.conf内所列的目录下的库
+48)	fdisk -l /dev/sda
+49)	vim使用：2yy y2w
+50)	dmidecode -t memory |grep -i size 可以查看内存的大小
+51)Nohup test.sh & 可以让该脚本在后台进行
+52)smartctl -a /dev/sda 可以读磁盘温度sn号等
+1.2 常用shell脚本命令
+1)	cat phonenum.txt |sort -u|wc -l
+sort -u 的作用是剔除相同行，wc -l是计算行数
+2)	若直接换行直接输入echo即可，不需要后面添加内容，可以自动换行
+3)	read ip user < 1.txt
+1.txt的内容是 10.1.1.1 hby 
+echo $ip 就是10.1.1.1
+4)	./1.sh & 放到后台运行
+5)	echo -n "hello world" 不换行打印 
+6)	ping -c1 $ip.$i $>/dev/null 可以有这样的写法
+7)	shell界面写true，接下里echo $?就打印0 写false就打印1
+8)	head -3 phonenum.txt 打印phonenum.txt 的前3行
+head -3 phonenum.txt |tail -1 
+tail -1的作用就是打印下面的一行，所以上面的命令就可以筛选第三行
+9)	echo $RANDOM 打印一个随机数
+10))	time ./shezhimima.sh 查看脚本运行时间
+11)	echo 123456|passwd --stdin stu01 给一个用户设置密码
+12)	创建一个组 groupadd class 创建一个用户useradd u1p
+13)	往一个组里添加用户 useradd -G class u1 往clas这个组里添加u1这个用户
+14)	查看用户组 cat /etc/group 查看用户 cat /etc/passwd
+15)	for i in {2..22} 写法正确，for i in{2..$val} 写法错误，因为for中只能指定确定的数值
+16)	touch file{5..8} 可以创建file5到file8之间包括自身的所有文件	
+17)	[ -s file5 ]  ||  echo hby 在终端可以这样使用
+18)	if [ $(($i%2)) -eq 0 ]; then
+$[$i%2] 引用变量必须这样写
+注：if后面有空格，中括号两边有空格
+$() 和` `效果一样
+19)	for i in $(seq 2 $[$val-1]) 等价于 for i in `seq 2 $[$val-1]`
+20)	if 和elif后面需空格
+21)	echo 1 >> 1.txt 会直接创建1.txt文件
+22)	记得if[  ] 判断的时候只有一个等号
+23)	[ !-d ./dir1 ]; 判断一个文件不是目录
+24)	[ file -ef file2 ];echo $? 比较两个文件是否一致，也就是他们的id号是否一致，内容一致id号也会不一致
+25)	let n=n**3 计算一个数的幂值
+26)	echo $$ ？？？  echo $$  返回登录shell的PID
+27)	ln -s file1 test1   if[ -L ./test1 ];echo $? 0 判断是不是一个链接文件
+28)	test -r i2cdetect;echo $? 判断icdetect文件是不是可读的l
+29)	-s是判断文件是否不为空，！-s判断文件是否为空文件，要和字符串的-z     和-n区分开
+30)	test -z "hello";echo $? 前面为空就会打印0,echo &?假就是1所以打印的是1，-z 就是空就是1，非空就是0，所以test –z “hello” 执行的结果就是0，但是echo $?结果0打印就是1
+32)	echo $(( 256*22 ))等价于echo $[ 256*22 ]
+33)	-e	判断文件是否存在（link文件指向的也必须存在）	exists
+34)	-f	判断文件是否存在并且是一个普通文件	file
+35)	 [ -d  ./file1 ];echo $? 如果是目录文件在就会打印0，但是是文件的话就打印别的数字
+36)	ll -i 可以显示inode号
+37)	$0 当前执行脚本的名字，$1 当前执行脚本的第一个参数一次类推，$* 脚本输入的所有的参数和$@一样
+38)	echo $?查看上一次的shell命令有无执行成功，成功的话就会显示0，没有成功就会显示别的数字
+39)	ccc=itcast export ccc 等价于export ccc=itcast 和declare -x 定义一个环境变量和export一样
+40)	/etc/profile 全局环境变量信息
+41)	env 查看当前用户的环境变量
+42)	declare -r B=111  定义B只读
+43)	双引号可以引用变量
+44)	read -p "Input": ip < ip.txt 把ip.txt的内容当作密码输入给ip
+45)	B=$(uname -r)等同于b=`uname -r`
+46)	echo ${A:2:3} 截取第2个字符的后面三个
+47)	read -t 3 -p "input": name 限制输入三秒
+48)	read -n 5 -p "INput your name": name 限制输入个数
+49)	read -s -p "Input your name  " pass 隐藏密码
+50)	read -p "Input your name" name 输出相应提示
+51)	unset取消变量
+52)	bash -x 25.sh 查看脚本调试过程
+53)	bash -n  查看脚本语法有误错误
+54)	cat phonenum.txt |sort -u|wc –l  sort -u 的作用是剔除相同行，wc -l是计算行数
+55)	grep -v 就是反向查找，查找不含后续字段的行
+56)	grep -w 就是精准查找，默认只匹配一个单词
+57)	shell中if[-z]就是后面是数据是空的它就是真的，就成立
+58)	awk -F 后面加一个.就是指定了分隔符
+59)	awk {print $2} 就是一行行读取文件，以空格为分割符，打印第二个字段
+60)	modprobe命令用于智能地向内核中加载模块或者从内核中移除模块
+61)	depmod -a
+这个命令一般放在make modules_install之后。depmod可检测模块的相依性，供modprobe在安装模块时使用。
+62)	ggYG复制全部
+63)	数组有两种定义的方式一种是单个单个定义
+array[0]=hby
+array[1]=harry
+还有一种是整体定义
+arry={5 6 7}
+获取数组的第一个元素是
+echo ${array[0]}
+获取数组的所有元素
+echo ${array[*]}
+获取数据所有元素的个数
+echo ${#array[*]}
+echo ${arry[*]:1:3} 打印这个数组下标为1后的三个元素
+64)	source和./执行脚本的区别？？？
+65)	grep -s 选项表示不显示不存在或无匹配文本的错误信息
+66)	sed -n 4p打印第四行
+2：基本知识
+2.1 C语言知识
+1)	access函数？
+access函数用来判断指定的文件或目录是否存在(F_OK)，已存在的文件或目录是否有可读(R_OK)、可写(W_OK)、可执行(X_OK)权限。F_OK、R_OK、W_OK、X_OK这四种方式通过access函数中的第二个参数mode指定。如果指定的方式有效，则此函数返回0，否则返回-1
+2)strstr(str1,str2) 函数用于判断字符串str2是否是str1的子串。如果是，则该函数返回str2在str1中首次出现的地址；否则，返回NULL。
+3)gcc如果加参数 -c 是只编译不连接 去掉后就好了，假如只想编译一个.c文件
+4) BIT(3) 是一个宏，用于设置一个二进制位，具体的实现可能类似于 (1 << 3)。在这种情况下，BIT(3) 表示将第 3 位设置为 1。
+
+
+4)	cpunum_temp=strtoul(tmp, NULL, 10);把tmp按10进制转化输出
+5)	代码怎么变成一个可执行文件的，先编译出所有目标文件，然后把这些目标文件链接起来首先预处理（头文件的包含，注释的删除，define的替换）编译（将.c代码翻译成汇编代码）汇编（将汇编代码转化成二进制代码）合并段表就成了可执行文件
+8)	GBK编码，一个汉字占两个字节。 UTF-8编码是变长编码，通常汉字占三个字节
+9)	1、全局变量（所有文件可见的）  因此extern可以获取2、静态全局变量（当前文件可见的）
+10)	static作用？？
+分两种情况
+一种就是修饰本文件定义的变量或函数，只能在本文件调用使用，也就是假如其它的文件用extern这个关键词来声明也是获取不到的
+第二种就是修饰函数体里面的变量，一般来说正常定义的变量，这个函数体结束了因为都是局部变量存放在栈空间所以函数体结束的话定义的变量
+也就会结束，但是通过static修饰之后呢，这个变量被放在了静态存储区，不会随着函数体的结束而结束，所以你多次调用包含static修饰变量的函数体的时候，变量的值还是保持上一次调用完的值，而不会置初始位，尽管你函数体里static int a = 0；但a++，下次调用的时候a的值是1，不是0
+11)	extern g_para_t envpara 类似这种，就是声明了一个外部的变量，extern只能用于声明全局变量
+1、用extern对全局变量作提前引用声明，可以扩展全局变量在文件中的作用域；此时就可以从声明开始位置起，合法的使用该全局变量----》这句话的意思就是
+若下面定义了，全局申明的情况，定义之前还是可以用的
+2、通常情况下，都将全局变量定义在所有使用它的函数之前
+3、若程序包含多个文件，其他文件需要用到另外一个文件的全局变量，则可以在需要用到此全局变量的文件里用extern对该全局变量作外部声明，将该全局变量的作用域扩展到本文件，从声明处一直到文件结束--------》这种情况最常见
+12)	函数声明的时候为什么加extern？？？
+只是将该函数显式的指定为extern(全局可见的)
+不加也可以，因为函数默认就是extern(全局可见的
+14)	进程间通信：{
+	同一台机器才可以用管道和消息队列用于进程间通信---> 少用
+	不同服务器可以用socket
+	共享内存，信号量	
+	操作系统分配一块物理地址给共享内存，共享内存没有加锁的机制，要加锁的话需要加信号	
+}
+15)	正数在计算机中存储的是原码，而负数在计算机中存储的是补码
+16)	无符号数据类型（%u）
+17)	new / delete 是C++运算符，malloc / free是C/C++语言标准库函数
+18）把整型16转换为8进制，存在str里面，存在str里面的是字符（其中16可改为其他想要转换的整型数字，如25，40...），（8可改为其他想要转换的进制，如2，4，16...）itoa(16,str,8)
+19)	register这个关键字请求编译器尽可能的将变量存在CPU内部寄存器中，而不是通过内存寻址访问，以提高效率。注意是尽可能，不是绝对。因为，如果定义了很多register变量，可能会超过CPU的寄存器个数，超过容量。
+20)	int arr[4]={1,2,3,2};int len_arr = sizeof(arr);---------->len_arr等于16
+char *a = malloc( 12 ); printf("%d \n", sizeof(b));------->等于8，指针在64位占8个字节
+2.2 英语单词
+Compress  压缩  detecting  检测 chips芯片 buzzer 蜂鸣器 configuration 配置
+2.3 Linux知识
+2.3.1 pci相关
+2.3.1.1 pci相关概念
+1）PCI设备的配置空间共由 64个字节组成，其地址范围为 0x00 ~ 0x3F，这 64个字节是所有 PCI设备必须支持的
+2.3.1.2 pci相关命令
+1)setpci -s 0a:00.0 A0.b=0x01修改 0a:00.0设备配置空间 A0地址处 1字节的内容
+2)lspci -tv 看pci设备树状图
+2.3.1.2 pci相关速率
+lspci -k 可以看出所有pci设备对应的驱动程序
+
+2.3.2 GDB
+1．gcc -g -o my_program my_program.c 编译成可gdb的文件
+2．gdb my_program		gdb该调试文件
+3．break main          # 在main函数开始处设置断点
+4．break 25            # 在第 25 行设置断点
+5．break my_function   # 在 my_function 函数开始处设置断点
+6．run                运行程序
+7．Step				   单步执行
+2.3.3 linux内核
+2.3.3.1 linux内核编译
+一、基本概念：
+（一）/lib/modules/$(uname -r) 是已编译内核模块的安装目录，而不是内核源代码目录。这个目录包含的是已编译的内核模块文件（.ko 文件），以及其他与内核加载和管理有关的文件。这些文件是在内核编译和安装过程中生成并安装到系统中的。
+
+（二）内核源代码目录通常是 /usr/src/linux 或类似的路径，其中包含了完整的 Linux 内核源代码。这个目录用于开发和构建新的内核模块，或者进行内核的定制和调试
+
+
+二、步骤：
+①　下源码
+②　解压
+③　安装相应的编译所需的rpm包
+④　替换.config文件
+⑤　make -j32 bzImage编译
+
+三、Demo代码
+[root@localhost Project_HBY]# cat Makefile
+obj-m += hello.o
+
+KERNEL_DIR := /driver/linux-5.10/
+
+all:
+make -C $(KERNEL_DIR) M=$(PWD) modules
+
+clean:
+make -C $(KERNEL_DIR) M=$(PWD) clean
+
+2.3.4 linux目录相关
+1．/etc/modprobe.d/目录是用于存放Linux系统中modprobe命令的配置文件的位置。这些配置文件通常用于指定模块加载选项、黑名单、别名等设置，以影响内核模块的加载和管理行为。
+
+2.3.5 常用的shell结构
+2.3.5.1 for循环
+1.for letter in {a..z}; 
+2.do
+3.        dd if=/dev/sda$letter of=/dev/null bs=512k count=200 iflag=direct >/tmp/ddresult_devsday
+4.        echo $letter
+5.done 
+6.
+
+
+
+
+
+
+2.4 专业词汇概念
+2.4.1 硬件基本概念
+1.什么是flash？flash是闪速存储器，尽管在断电的情况下还是可以存储信息
+2.4.2 产品基本概念
+1)（BMC）：在一些高端服务器中，基板管理控制器（BMC）是一个独立的处理器，负责监控和管理服务器的各种硬件和系统功能。BMC 通常也集成了 I2C 控制器，用于与服务器中的传感器和其他设备进行通信。
+2)（U.2和M.2）:U.2和M.2是两种不同的接口规范，主要用于连接存储设备，如固态硬盘（SSD）到电脑系统。虽然两者都可以支持高速数据传输，但它们在形状、尺寸和用途上有所不同。两者接口均可接入不同协议的如sata和nvme的ssd
+3)（1U,2U）:1U：一个"U"（也称为"rack unit"）等于1.75英寸（4.45厘米）的高度。因此，1U的服务器的高度为1.75英寸，2U：同样，2U服务器的高度就是1U的两倍，即3.5英寸（8.89厘米）
+
+                                                                                                 
+2.5 工具使用
+2.5.1 SVN用法
+
+
+
+
+
+
+
+
+
+
+
+3：每日学习总结（每周总结）
+6.19：
+1）iic协议包括主从设备，每个设备有唯一地址，且都有SDA和SDL以及一个电阻。
+开始信号：SCL 为高电平时，SDA 由高电平向低电平跳变，开始传送数据。
+结束信号：SCL 为高电平时，SDA 由低电平向高电平跳变，结束传送数据。
+通信协议包括：iic spi uart wifi can bluetooth usb等等
+
+6.27：
+dd if=/dev/zero of=/dev/sdb bs=1K count=1
+gdisk /dev/sdb
+dmesg
+modinfo /lib/modules/3.10.0/kernel/drivers/net/ethernet/intel/i40e/i40e.ko
+
+6.28：
+lspci -tv 列出pci设备的树状图
+Lspci -nn 列出pci设备有关厂家的信息
+lspci -s 0000:0c:00.0 -vvv 查看详细信息 包括连接速率
+Cat test.txt |grep -i “hby” |awk ‘{print $1}’ |sed -n 1p 打印第1行第1列、
+dd if=/dev/zero of=/dev/sdb bs=1K count=1 命令的意思是从 /dev/zero 设备读取一个1KB大小的数据块，并将其写入 /dev/sdb 设备文件中，覆盖目标设备上的数据。
+
+lshw -C network 的作用： 该命令用于显示系统中的网络设备信息。通过运行 lshw -C network 命令，您可以获取关于网络设备（如网卡、无线适配器等）的详细信息，包括设备的型号、制造商、驱动程序、连接状态、速度、物理标识符等。该命令会列出系统中所有的网络设备及其属性。
+
+
+smartctl -i /dev/sda 的作用： 该命令用于查看磁盘（硬盘）的 SMART（Self-Monitoring, Analysis, and Reporting Technology）信息。通过运行 smartctl -i /dev/sda 命令，您可以获取有关指定磁盘的基本信息，包括制造商、型号、固件版本、序列号、用户容量、扇区大小、转速等。SMART 信息提供了磁盘的健康状态、故障预测和性能数据。
+
+
+systemctl 的具体用法： systemctl 是一个用于管理 systemd 系统和服务的命令行工具。通过该命令，您可以对系统进行各种操作，如启动、停止、重启、启用、禁用和监视服务，以及管理系统的各种单元。以下是一些常见的 systemctl 命令：
+
+启动一个服务：systemctl start service-name
+停止一个服务：systemctl stop service-name
+重启一个服务：systemctl restart service-name
+显示一个服务的状态：systemctl status service-name
+启用一个服务，使其在系统启动时自动启动：systemctl enable service-name
+禁用一个服务，使其在系统启动时不自动启动：systemctl disable service-name
+查看服务是否已启用：systemctl is-enabled service-name
+查看服务是否正在运行：systemctl is-active service-name
+列出所有已安装的服务：systemctl list-units --type=service
+查看系统日志：journalctl
+
+lspci -s 0000:0c:00.0 -vvv 的作用： 该命令用于显示指定 PCI 设备的详细信息。通过运行 lspci -s 0000:0c:00.0 -vvv 命令，并指定要查询的 PCI 设备的位置标识符，您可以获取有关该设备的详细信息，包括设备的型号、制造商、驱动程序、总线信息、物理标识符、支持的功能和特性等。该命令提供了对指定 PCI 设备的深入了解。
+
+当你执行命令 export LD_LIBRARY_PATH=/path/to/library 时，它实际上是设置了一个环境变量，叫做 LD_LIBRARY_PATH。在 Linux 系统中，这个环境变量用于告诉系统去哪里查找共享库文件（也称为动态链接库）。共享库包含许多程序所需的功能代码。通过设置 LD_LIBRARY_PATH，你可以指定一个路径 /path/to/library，告诉系统在这个路径中寻找共享库文件。这样做的好处是，当你运行一个程序时，系统会按照 LD_LIBRARY_PATH 中指定的路径来查找所需的共享库文件，以便程序能够正常运行。
+
+.
+
+4：岗位相关工作内容
+4.1  Linux 驱动?程师
+岗位职责：
+负责X86和鲲鹏架构服务器产品线的Linux设备驱动相关的支持，需要熟悉Linux驱动开发知识和硬件基础知识，能够快速定位问题，让设备在最新硬件平台和新版Linux中正常?作。
+岗位要求：
+1. 3年以上Linux设备驱动开发经验。熟悉C或C++编程语?。
+2. 熟悉常?的总线协议（如PCI、USB、I2C、SPI等）。
+3. 掌握Linux设备的驱动程序开发技术：如块设备驱动、USB驱动、?卡驱动、PCIe驱动等特定类型的驱动程序。
+4. 具备?定的英语阅读和写作能?，能够阅读和编写技术?档、邮件等。
+4.2  Linux 内核专家
+职位描述
+工作职责:Linux 内核研究，内核开发，开源系统镜像发布，维护，开源内核问题分析
+1.熟悉arm cpu 架构，
+2.熟悉linux 驱动开发，内核调优
+3.有熟练的内核调试技巧，熟悉gdb kdump
+4.有开源镜像编辑，有适配过开linux os
+5.要有研究精神，问题分析能力
+6.有向社区內核提交过补丁的优先录取
+4.3  Linux Firmware Engineer
+职位职责：
+1、负责嵌入式系统固件的开发和维护，包括uboot、内核、BuildRoot、Linux平台上的设备驱动程序和应用软件。
+2、负责完成Linux内核升级、将Linux应用程序迁移到不同硬件平台、操作系统裁剪和文件系统设置等任务
+3、使用仿真器、编程器、示波器等工具启动和调试硬件开发板。
+4、具备基本的硬件知识，并参与硬件设计和开发。
+5、参与业务需求讨论，审查产品设计，按时高质量完成产品交付。
+岗位要求：
+1、熟悉C/C++语言、嵌入式开发和调试环境。
+2、熟悉ARM设备和Linux系统的结构，Linux系统编程和网络编程。
+3、熟悉Linux内核、驱动程序和用户级应用程序界面，以及系统的并发操作。
+4、熟悉Linux文件系统，能够裁剪和编译内核；精简嵌入式Linux系统的内核和冗余服务，以便快速启动系统并平稳运行。
+5、熟悉所开发的硬件、硬件接口、处理器资源的基本知识，能够开发Linux设备驱动程序。
+6、能够胜任底层驱动程序和业务逻辑应用程序开发。
+7、熟悉Linux网络架构，深入了解Linux网络内核模块的实现。
+8、熟悉TCP/IP通信协议和SQLite数据库。
+9、熟悉多线程和信号量机制。
+10、熟悉串行总线通信，如RS232/RS485/RS422等。
+11、熟悉Modbus接口优先。
+12、良好的英语读写能力。
+
+4.4  Linux工程师
+工作职责
+1、负责嵌入式Linux系统Boot、Kernel、Filesystem等基础平台的开发及维护, 
+2、负责嵌入式Linux各接口（GPIO、UART、I2C、SPI、SDIO等）驱动及外设驱动的开发维护, 
+3、负责嵌入式Linux系统专项测试及验证, 
+4、负责过程方案设计、实施，文档输出等。
+任职资格
+1、计算机、电子、自动化等相关专业, 
+2、熟悉ARM体系架构，熟悉嵌入式Linux操作系统（boot、驱动、内核裁剪、文件系统定制、第三方库移植）,
+3、具备嵌入式Linux应用程序开发能力（使用C/C++、Shell实现基本驱动验证及应用程序开发）。
+
+4.5  Linux工程师（深信服）
+岗位职责：
+1、负责数据安全产品的设计和开发工作
+2、负责关键技术的预研和攻关
+岗位要求：
+1、本科及以上学历，1至5年工作经验
+2、熟悉c/c++语言程序设计
+3、熟悉linux系统编程以及相关的调试技术
+4、熟练掌握常见的数据结构和算法
+5、熟练运用脚本语言(lua/shell/php/python 其中任意一种)
+6、良好的团队协作和沟通能力，责任心强，做事认真负责，自我驱动力强
+
+4.6  Linux工程师（道通）
+
+工作职责：
+1、根据产品的功能需求，负责嵌入式Linux系统的方案设计、总体架构设计及详细设计。
+2、对嵌入式Bootloader及Linux剪裁、移植、优化；
+3、硬件设备驱动开发、BSP包及第三方库移植；
+4、给Linux应用软件的开发人员提供Linux操作系统相关的支持；
+5、开发操作系统抽象层，为应用层软件提供统一的与操作系统无关的接口；
+6、编写相关设计文档、调测试过程文档、使用说明文档等。
+任职资格：
+1、计算机、电子、信息、通信等相关专业毕业，本科及以上学历；
+2、精通C/c++语言，有扎实的编程功底，良好的编码习惯，5年左右嵌入式Linux驱动开发经验；
+3、熟悉u-boot开发，板子启动调试，系统引导等，熟悉嵌入式Linux的开发环境和调试方法；
+4、熟悉Linux内核，熟悉常用设备驱动开发，如GPIO、WIFI、Sensor等；
+5、热爱嵌入式开发工作，具备优秀的沟通能力和团队合作精神，执行力强、效率高，良好的协调交流能力。
+
+4.7  Linux工程师（润芯微）	
+岗位职责：
+1. 精通c/c++编程
+2. 熟悉Linux嵌入式操作系统开发
+3.有linux应用和多线程编程经验
+4.工作仔细，逻辑清晰
+5.职位是工程师，不是高级工程师。 技术指标排在逻辑能力后面。
+任职要求：
+1. 精通c/c++编程
+2. 熟悉Linux嵌入式操作系统开发
+3、计算机/通信/电子/自动化等相关专业本科及以上学历，2年以上开发经验;
+4、熟悉一到三类处理器的外围接口，如PCIE、USB、SPI、I2C、EEPROM、Ethernet switch、UART等;
+5、具备良好的编程风格与文档习惯，熟练使用常用的软件版本控制工具（repo or git);
+6、有芯片、手机等Linux或者Android底层驱动开发经验优先考虑;
+7、具备较强的学习能力，优秀的职业素养和团队协作精神、敬业精神
+4.8  Linux工程师（长沙重工企业）
+
+岗位职责
+1、负责产品模块设计方案编写；
+2、根据产品需求，在linux操作系统下进行C/C++及驱动开发。
+任职要求
+1、计算机/软件相关专业本科（全日制）以上学历；
+2、三年以上Linux内核驱动开发经验；
+3、熟悉Linux 内核开源社区发展，参与过内核方向社区开发尤先；
+4、熟悉Linux系统性能调优及Linux服务管理；
+5、熟悉嵌入式设备linux内核适配（体系结构适配）；
+6、熟悉使用kexec、crash进行内核调试。
+
+
+
+==========================================
+2024.5.10
+cpu release
+怎么看就是接管成功了呢--->接管完成有个 takeover finish
+yuyani 问题为脚本中判断fwver错误
+协助wangxin定位内部串口问题
+设备正常上着电且未带业务的情况下，拔掉一组系统风扇后再插回，环境3组系统风扇长时间高速运行，我问下这里是如何调速的？环境主板、cpu以及磁盘都没啥问题
+
+内部串口测试方法：
+两端都创建/root/test/data.txt和/root/test/date.txt，写入数据（date.txt和data.txt应该是开发人员的笔误）
+两端都执行/usr/local/hstor/driver/equipment_test/eeprom_serial_test -serial -t100 -l10
+...
+
+ENVmonitor -s -remote -poweroff /on  后马上 下发 ENVmonitor -s -remote -default 会打断 poweroff on的操作
+
+cli "disk display list" |tac 可以翻转
+
+拓展槽文档：
+"EMC" 可能指的是 "Electromagnetic Compatibility"（电磁兼容性）。电磁兼容性是指电子设备在电磁环境中工作时，不会产生或受到无法接受的电磁干扰的能力。在这个情况下，"拉手模块上有凸点与机箱搭接，以保证EMC" 可能意味着拉手模块上的凸点设计是为了确保机箱的电磁兼容性。
+
+位图的使用 bitmap为定义的unit64的两个元素的数组，因此可以操作128个位就方便操作磁盘
+{
+麻烦帮我介绍一下这个宏定义为什么可以实现bitmap的作用#define ATA_BITMAP_SET_BIT(bitmap, bit) \
+	do{\
+		bitmap[(bit) >> 6] |= 1UL << ((bit) & 63);\
+	}while (0)
+ChatGPT
+这个宏定义实现了设置位图中特定位的功能。位图是一种数据结构，用于表示一组位的集合，通常用于标记某些状态或标识某些对象的存在或缺失。这个宏定义使用了位操作来实现设置位图中特定位的功能。
+
+让我们逐步解释这个宏定义：
+
+#define ATA_BITMAP_SET_BIT(bitmap, bit) \: 这行代码定义了一个宏，名为 ATA_BITMAP_SET_BIT，它接受两个参数，bitmap 是表示位图的数组，bit 是要设置的位的索引。使用 \ 是为了将宏定义延续到下一行，以提高代码的可读性。
+
+do { ... } while (0): 这是一个 do-while 循环，用于包裹宏定义的实际操作。使用 do-while 循环的目的是确保宏定义能够像函数调用一样使用，并且可以安全地嵌套在其他控制流语句中。
+
+bitmap[(bit) >> 6] |= 1UL << ((bit) & 63);: 这是实际的操作代码。首先，(bit) >> 6 计算出 bit 在位图数组中的索引，因为一个 unsigned long 变量通常可以表示 64 位，所以右移 6 位相当于除以 64。然后，(bit) & 63 计算出 bit 在对应 unsigned long 变量中的偏移量，因为 64 对应二进制为 1000000，减去 1 后为 111111，所以进行 bit 和运算相当于取余。最后，使用 1UL << ((bit) & 63) 来生成一个只有特定位被置位的值，然后通过 |= 操作符将该值与对应的 unsigned long 变量相或，以设置位图中的特定位。
+
+这样，使用这个宏定义可以很方便地设置位图中的特定位，而无需编写复杂的位操作代码。
+
+}
+
+strcat(result, temp);：将刚刚转换好的字符串 temp 拼接到结果字符串 result 的末尾。这个过程会不断累积，将每次循环中得到的字符串拼接到一起。
+
+strncat(result, &separator, 1);
+strncat 函数用于将一个字符（分隔符）拼接到结果字符串的末尾
+
+
+
+1DPC（DIMMs Per Channel）： 指的是每个内存通道上的DIMM数量。例如，如果一台计算机有两个内存插槽，而每个内存插槽中安装了一个内存条，那么这台计算机就是1DPC配置。
+
+2RANK： 指的是内存条上的芯片排数。内存条通常由多个芯片排组成，每个芯片排包含一组内存芯片。2RANK表示内存条上有两组芯片排。
+
+
+wireshark是一个抓包工具，可以了解
+
+scsi属于中间层
+
+sd_mod注册成块设备
+
+dd命令-->下发scisi命令-->下发给控制器-->下发给盘
+
+
+
+内存测试工具:
+memtester 1G 1内存测试工具
+
+今日收获：
+{
+学会看pci寄存器并配置pci设备寄存器
+setpci -s 09:00.0 40.w=1122
+
+了解sata相关概率
+sata既是一种协议也是一种器件，协议是上接ahci协议下给sata控制器下发指令
+sata协议也分层，最下面是PHY层，物理层，链路层 还有传输层 
+}
+
+
+今日收获
+{
+	AHCI 控制器就是 SATA 控制器的一种，用于提供与 SATA 设备通信和控制所需的接口和功能。
+	了解到sata控制器的初始化流程
+	ahci控制器初始化
+	到ata模块注册
+	在把ata控制器注册到scsi主机上
+	就可以通过scsi模块来控制与sata控制器连接的设备了
+	同时scsi模块还有相应的错误处理
+	ssd是固态硬盘，普通的ssd配的是SATA口（AHCI协议），nvme ssd配的是PCIe口（nvme传输协议）
+}
+
+
+mount命令可以查看所有的挂载
+
+bash-4.2# isoupdate
+The CompactFlash Disk is /dev/md126p.
+Are you sure to recover the system (yes/no/ipv6)?yes
+******************************************
+
+1048576 bytes (1.0MB) copied, 0.025293 seconds, 39.5MB/s
+auto partition /dev/md126p1 2048 6425999
+auto partition /dev/md126p2 6426000 53002559
+auto partition /dev/md126p3 53002560 55139207
+auto partition /dev/md126p4 55139208 60408527
+格式化分区打印这个是不是证明组成了raid1
+
+
+	编译内核步骤
+	[root@c_ucs2_new kernel_make]# tar -xvf linux-5.4.20.tar.xz
+	[root@c_ucs2_new kernel_make]# sh build_k.sh build linux-5.4.20 linux_kernel_5.4.20/
+	[root@c_ucs2_new kernel_make]# cd linux-5.4.20/
+	[root@c_ucs2_new linux-5.4.20]# ls
+	arch   certs          COPYING  crypto         drivers  include  ipc     Kconfig  last_users_info  LICENSES     Makefile  net     samples  security  tools  virt
+	block  config-5.4.20  CREDITS  Documentation  fs       init     Kbuild  kernel   lib   MAINTAINERS  mm        README  scripts  sound     usr
+	[root@c_ucs2_new linux-5.4.20]# mv config-5.4.20 .config
+	[root@c_ucs2_new linux-5.4.20]# make -j32 bzImage
+
+	makd -j 32的目的是利用32个核
+
+
+出厂设置时间流程
+制造阶段：
+
+时间设定：在设备制造或测试阶段，制造商通常会使用专门的工具和软件将RTC设置为当前的实际时间。这一步通常是在制造和测试设备的最后阶段完成的，以确保时间的准确性。
+固件/BIOS设置：有些设备的BIOS或固件可能会在第一次启动时自动从RTC读取时间，并将其写入系统时钟。
+设备启动：
+
+RTC读取：设备启动时，操作系统会从RTC读取时间，并将其用作系统时间的初始值。这通常在启动过程的早期阶段由操作系统的内核完成。
+系统时间初始化：操作系统会初始化系统时钟（通常基于自1970年1月1日00:00:00 UTC以来的秒数），并应用读取到的RTC时间值。
+操作系统加载：
+
+时间显示：当操作系统加载完成后，运行date命令或其他时间显示工具时，会显示从RTC读取并初始化的系统时间。如果设备连接到网络，操作系统可能会与时间服务器同步，以确保时间的准确性。
+
+
+
+sh make_3000.sh 怎么调用make的
+
+
+cleanup了解
+remove这个函数只能删除某个路径，不能删除某个文件
+
+
+
+i2c从机地址：
+主机通常就是MCU，从机会有一个地址，这个地址通常前4位是器件本身固定的，5-7位可以硬件选择，最后一位通常是WP位，一般此位低电平表示正常读写，此位高电平表示读保护，只能读。如常用的EEPROM 24C02，地址高四位是1010，5-7位硬件连接决定，即是将其A0-A2引脚接地为000，这样设备地址是0xA0或者0xA1（读）。
+
+
+
+lspci -nn可以看到制造厂家和id号
+
+
+2024.7.26
+学习pci 初步了解kdump
+
+
+cpu寻址空间包括pci空间和内存空间
+
+[root@localhost-0 ~]# cat /proc/cpuinfo |grep -i address
+address sizes   : 39 bits physical, 48 bits virtual
+
+最大的cpu寻址空间为2的39次方
+
+cat /proc/iomem 的空间包括pci设备映射的空间和实际物理内存
+映射的目的是cpu只能通过访问映射的地址空间因此访问pci设备，映射的空间不实际占据实际的物理内存
+cat /proc/iomem |grep -i "system RAM" 这个就是实际的物理内存的大小
+
+
+cpu socket就是cpu的插槽
+
+
+
+1000  cat /etc/yum.conf
+1001  cat /etc/yum/protected.d/dnf.conf
+1002  cat /etc/yum/protected.d/yum.conf
+1003  cat /etc/yum.repos.d/*
+1004  history
+
+
+/etc/yum.repos.d/openeuler.repo 可以配置yum源的路径，默认路径是该系统的http链接官网
+
+116版本用例
+
+内存检测工具的用法
+valgrind
+{
+191.168.58.108 的/etc/yum.repos.d/openeuler.repo cp到本地的测试机
+
+安装
+sudo yum install valgrind
+
+sudo yum install glibc-debuginfo
+
+使用
+valgrind --tool=memcheck --leak-check=yes /usr/local/hstor/driver/ENVmonitor/Monitor
+
+}
+
+
+
+LAN 
+local area network
+WAN
+wide area network
+局域网通过路由器连入广域网
+
+两个不同的局域网中确实可以存在相同的私有IP地址，而且这些设备之间仍然可以通过互联网正确通信，这主要归功于NAT（网络地址转换）技术。NAT设备（通常是路由器）在每个局域网与互联网的接口处工作，它会将局域网内部的私有IP地址转换成一个或多个公共IP地址，以便与互联网上的其他设备进行通信。
+
+ip地址可以获取web服务器的mac地址
+
+
+网络掩码（subnet mask）在IP网络中主要起到以下作用：
+
+网络与主机的区分：网络掩码帮助区分IP地址中的网络部分和主机部分。通过与IP地址进行位与（AND）操作，网络掩码可以“屏蔽”掉主机部分的位，留下网络部分，从而确定一个设备所在的网络。
+
+
+tracert baidu.com
+
+
+sed -i "s:console=ttyS0,115200n8:console=tty0 console=ttyS0,115200n8:" $GRUB_DIR/grub.cfg
+将串口显示转发到串口或图形控制台
+
+2024.8.29
+
+usb分为usb1.0 usb2.0 usb3.0
+
+mu-mimo技术常用于路由器，主要的功能就是处理与多设备的连接，因此提高了网络的效率和性能
+
+hwclock -w将软件时间同步到硬件时间
+hwclock -s将硬件时间同步到软件时间
+
+=======================================================
+2024.8.30
+
+
+/sys/class目录还用于关联驱动程序和硬件设备。当一个驱动程序加载时，它会在相应的设备类别目录下创建设备文件，这样用户空间程序就可以通过这些文件与设备通信。比如说sata驱动程序就会到class下面创建一个设备文件供monitor访问
+
+sys/class关注设备的逻辑分类和功能，它从设备的功能和用途角度来组织设备，提供了一个用户空间程序可以访问的统一接口。
+sys/devices关注设备的物理布局和连接关系，它反映了设备在系统中的实际位置和层次结构，这对于诊断硬件问题和理解设备之间的物理连接非常有帮助。
+两者之间的联系在于，/sys/class下的设备文件实际上链接到了/sys/devices下的物理设备节点，这样用户空间程序就可以通过/sys/class来访问和控制硬件，而内核则通过/sys/devices来管理硬件设备
+{比如说硬件的iic布局就可以通过/sys/devices来看到，但是应用层要访问iic就得从/sys/class这边来访问}
+
+
+设置永久ip
+打开网络接口配置文件。通常这些文件位于/etc/sysconfig/network-scripts/目录下，文件名格式为ifcfg-ethX，其中X是网络接口的编号，例如ifcfg-eth0对于第一个以太网接口。
+
+编辑该文件，在其中添加或修改以下行：
+
+BOOTPROTO=static：这行告诉系统在启动时使用静态IP地址。
+IPADDR=192.168.1.10：这行设置你的静态IP地址。
+NETMASK=255.255.255.0：这行设置你的子网掩码。
+GATEWAY=192.168.1.1：这行设置你的默认网关地址（如果需要的话）。
+DNS1=8.8.8.8：这行设置你的首选DNS服务器地址（可选）。
+
+假如你的网口需要ifup才能ping同对方ip有可能是防火墙没有关
+更改SELinux配置文件/etc/selinux/config中的SELINUX行，将其设置为permissive或disabled
+
+fdisk 命令可以删除磁盘分区，比如fdisk /dev/sdb
+选择d 选择1就可以将sdb1的分区给删除了
+选择g 就可以创建分区
+mkfs.ext4 /dev/sda就可以将sda格式成ext4的文件格式
+
+hexdump -C -n 128 /dev/sda 可以读到磁盘的前128个字节的内容
+
+dd if=/dev/zero of=/dev/sdb bs=1M count=128 给磁盘的前128个字节都d成0
+
+strace Monitor 可以看Monitor程序具体步骤的调用情况
+
+valgrind
+
+
+df -T
+
+[root@localhost ~]# df -T /tmp
+Filesystem     Type  1K-blocks  Used Available Use% Mounted on
+tmpfs          tmpfs    524288   128    524160   1% /tmp
+
+内存泄漏的几种形式
+{
+1：空指针复制
+2：野指针 被释放的内存给它赋值
+为什么是野指针
+	内存释放后：free(p) 释放了内存，但指针 p 仍然持有该内存的地址。
+	野指针行为：在释放内存后，p 指向的内存可能被操作系统回收或重新分配给其他程序。因此，向该地址写入数据会导致未定义行为（undefined behavior），包括程序崩溃或数据损坏。
+3：内存越界
+4：内存未释放
+5:内存生成和释放机制不一致
+6：内存空间重复释放
+
+}
+
+为什么需要初始化结构体字段？
+未定义行为:
+
+如果结构体字段未初始化，它们将包含随机的垃圾值（即栈上的残留数据）。
+使用这些未初始化的值会导致未定义行为，程序可能会崩溃或产生不可预测的结果。
+
+
+
+lspci -vvv -s 00:1f.4 可以看到是哪个驱动给驱动的
+
+
+看linux内核书籍
+
+自旋锁（Spinlock）一般用于中断
+短时间持有: 适用于持有时间非常短的临界区，因为线程在等待期间会消耗 CPU 时间。
+低延迟: 由于没有涉及线程调度，自旋锁通常提供较低的延迟。
+单处理器环境: 在单处理器环境中，自旋锁可能会导致死锁，因为线程在等待时无法让出 CPU。
+互斥锁（Mutex）
+长时间持有: 适用于持有时间较长的临界区，因为线程在等待期间会被阻塞，不会消耗 CPU 时间。
+多处理器环境: 适用于多处理器环境，因为线程可以被调度到其他处理器上运行。
+复杂操作: 适用于需要进行复杂操作或涉及睡眠的临界区。
+
+
+
+Out of memory: Killed process 612693 (java) total-vm:3315472kB, anon-rss:71852kB, file-rss:0kB, shmem-rss:32kB, UID:0 pgtables:456kB oom_score_adj:0 
+可以看到没喂狗杀了哪个进程
+
+nm ko | grep 函数 看看有没双控得
+
+top -hp可以看进程的线程函数
+
+
+
+cat maps 可以看进程的内存映射地址
+
+kdb使用
+
+
+
+fsck.ext4 -y /dev/md126p3. 非V3设备就是md126p2
+
+cat /proc/meminfo
+
+
+
+openstack
+
+
+smartctl -a /dev/sda
+可以看系统卡的fwver版本
+
+cpu占用率过高引起cpu的温度过高可以用top看
+
+
+CXL 是一种互连标准，旨在提供高性能、低延迟的连接，用于连接 CPU、内存、加速器（如 GPU、FPGA）和其他存储设备。
+
+主频等于外频×倍频
+
+RDMA直接内存访问，网卡对网卡
+
+iSCSI 是一种基于TCP/IP的协议，允许通过网络（包括局域网和广域网）将存储设备（如硬盘或光盘）作为远程块设备来访问。它将SCSI命令封装在TCP/IP数据包中进行传输。
+
+systrace
+
+负责Linux文件系统/IO子系统的性能分析和问题解决
+
+/proc/iomem 文件：显示系统中已分配的I/O内存区域，这些区域通常是实际物理内存的一部分。
+
+1. CPU的位数（字长）
+CPU的位数通常指的是其数据总线的宽度，这决定了CPU一次可以处理的数据量。常见的CPU位数包括：
+
+32位CPU：一次可以处理32位（4字节）的数据。
+64位CPU：一次可以处理64位（8字节）的数据。
+
+2. 地址总线宽度
+地址总线的宽度决定了CPU可以访问的最大内存地址空间。地址总线的宽度通常与CPU的位数相同，但也有一些例外情况。
+
+32位CPU：
+
+地址总线宽度为32位。
+可以访问的最大内存地址空间为 2^32 字节，即4GB（4,294,967,296字节）
+
+64位CPU：
+
+地址总线宽度为64位。
+可以访问的最大内存地址空间为2^ 64字节，这是一个极其巨大的数字，大约为16 exabytes（18,446,744,073,709,551,616字节）。
+
+由于PCI总线高性能低延迟的特性，它用来扩展的是CPU的存储域和IO域。
+
+
+memtester 1G 1占用内存工具
+
+只有当程序实际访问这些内存页时，操作系统才会分配物理内存页。
+
+grep -a -r可以过滤出带有中文注释的行
+
+Call Trace可以看出是否堆栈
+堆栈信息的最后一行是 Call Trace:，接下来的几行是函数调用栈，每一行都是一个函数调用，最上面的是发生错误的函数，最下面的是最开始的函数。
+
+软raid 和硬raid
+
+例如，在 02:00.0 中：
+
+02 是总线号。
+00 是设备号。
+0 是函数号。
+
+跨网段 ping 操作确实需要涉及网关（路由器），以确保数据包能够从一个网络传输到另一个网络
+
+我们对外发布，发布的 ko一定是当前测试的ko，同时合入到版本里面。 有无strip --strip-unneeded 记得
+
+objdump -t 可以查看相关符号
+
+cat /proc/iomem
+
+看出所有寄存器的数据
+lspci -xxx -s 05:0e.0
+
+LPC总线，原名叫Low pin count Bus，是在IBM PC兼容机中用于把低带宽设备和“老旧”连接到CPU上。
+
+/proc/ioports 显示了系统中 I/O 端口的分配情况，涉及传统 ISA、PCI、LPC 等总线。通过分析这些地址，可以排查硬件冲突、确认设备驱动状态，或调试 PCI/LPC 设备的配置问题。
+
+是否从efi分区启动决定与是否存在vfat文件系统格式的分区，然后会从这里面找
+
+uEFI启动要求：
+硬盘必须使用GPT分区表（GUID Partition Table）。
+系统分区（ESP，EFI System Partition）必须存在，且格式为FAT32。
+Legacy启动要求：
+硬盘必须使用MBR分区表（Master Boot Record）。
+不需要ESP分区，但需要MBR引导记录。
+
+linux 不包含 .ko 文件：
+vmlinux 是静态编译的内核，仅包含在编译时直接编译进内核的功能（CONFIG_* 设置为 y 的选项）。
+.ko 是动态模块（CONFIG_* 设置为 m 的选项），独立于 vmlinux，需要在运行时通过 insmod 或 modprobe 加载。
+
+fdisk part可以将分区恢复
+
+iic传输分标准模式和快速模式，标准模式频率一般在100kbps，快速模式一般在400kbs,标准模式一般连接低速的eeprom和传感器
+
+不区分AB类，都是下电上电
+
+打流的参数：sar -n DEV 1
+
+alias ping='ping -c 5' 这个是什么意思 将shell命令别名
+
+
+DDR SDRAM DIMM 每个时钟周期传输两次数据，速度更快。分为 DDR、DDR2、DDR3、DDR4、DDR5。
+
+
+定位空指针可以搜关键词：
+
+BUG: kernel NULL pointer dereference,
+
+
+M.2插槽可能有B-key或M-key，其中B+M-key的插槽可以支持SATA和NVMe，而单独的M-key可能仅支持NVMe
+m.2的接口由cpu出的，是否支持与cpu有关
+
+
+__setup("hotplug_devices=", hotplug_devices_setup);  // 注册为内核启动参数
+
+/*kernel_cmdline="... hotplug_devices=00,01,01,00,01,00" */
+这种方式可以在grub传参的方式实现内核的操作
+
+是否能启动和分区中是否有efi文件有关，不挂载出来也没关系
+
+
+I/O 端口空间：最大 64KB（x86 架构），通过 in/out 指令访问，受16位地址的影响。
+I/O 内存空间：无统一上限，通过内存映射访问，最小单位通常是 4KB。
+
+
+类型	地址空间	宽度
+I/O端口	64KB	16位
+内存地址	4GB/1TB+	32位/64位
+
+sysctl -a |grep mem
+此命令可以看内核参数的配置，如网卡相关的ring buffer的配置
+
+strip --strip-unneeded i2c-designware-core.ko
+目的：减小 .ko 文件体积，保留必要符号。
+
+Primary Bus Number:主总线号，表示桥设备上游总线号，即桥连接的上一级总线的编号，用于标识桥所属的根总线 4）Secondary Bus Number:次总线号,指桥设备直接连接的下游总线号，是桥下游第一个PCI总线的编号 5）Subordinate Bus Number:从属总线号,是该桥下所有总线中最大的总线号，代表以该桥为根的子树中，总线号的最大值。
+
+sar -n DEV 1 10 每一秒读一次读十次网络设备的流量使用情况
+
+sar -u：CPU。
+sar -r：内存。
+sar -d：磁盘。
+sar -n DEV/TCP/IP：网络。
+sar -A：全系统监控。
+
+如果你是程序员，或者以后会从事计算机相关岗位
+就可以选
+
+中级-软件设计师
+高级-系统架构设计师
+
+如果你不是程序员，以后也不想从事程序员相关的工作。
+无脑选
+
+中级-系统集成项目管理工程师
+高级-信息系统项目管理师。
+
+创建raid1
+mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sda1 /dev/sdb1
+
+shell下通过mm -io 0xfc1a访问寄存器
+
+fio打流
+./fio -group_reporting -direct=1 -iodepth=128 -ioengine=libaio -filename=/dev/sdy:/dev/sdx -name=FIO_TEST -rw=write -bs=1M  -numjobs=1
+
+zgrep -H -A 50 "java.lang.NullPointerException" *.gz
+不用解压也可以查找日志
+
+MSI中断机制是一种通过内存写入操作来触发中断的现代化技术，它解决了传统中断机制的瓶颈，极大地提升了系统的I/O性能和响应速度，是现代计算机体系结构中至关重要的一环。
+
+所有的SDA 信号变化都要在SCL 时钟为低电平时进行，除了开始和结束标志
+
+起始：时钟线SCL为高时，数据线SDA由高到低
+停止：时钟线SCL为高时，数据线SDA由低到高
+
+
+ioremap是Linux内核中用于建立IO内存映射的关键函数。它的主要作用是将设备的物理地址映射到内核的虚拟地址空间，使得内核能够通过访问内存的方式来访问设备寄存器或内存。
+
+作用和目的：
+
+提供统一的访问接口：通过ioremap，驱动程序可以像操作普通内存一样操作设备寄存器
+
+实现物理地址到虚拟地址的转换：在支持MMU的系统中，CPU访问的是虚拟地址，需要将设备物理地址映射到虚拟地址空间
+
+支持缓存和写缓冲控制：可以通过不同的标志控制映射区域的缓存特性
+
+内核启动参数：cat /proc/cmdline
+在启动参数中可以看到内存的预留，所以就会导致free -h与实际的物理内存大小不一致的原因
+
+nm /usr/local/hstor/sms_install/usr/lib/libenv.so
+可以看出库里面包含函数
+
+“PCIe 设备的扩展配置空间”： PCIe 设备除了前 256 字节的标准配置空间，后面还有额外的“扩展配置空间”，总共可达 4096 字节。访问这个空间是配置和管理高级 PCIe 设备（如 SSD、万兆网卡）的基础。
+
+操作 I/O 端口
+在 Linux 设备驱动中，操作 I/O 端口通常遵循“申请-访问-释放”的步骤：
+
+申请端口：使用 request_region 函数向内核申请一段 I/O 端口区域。如果成功，该区域就会出现在 /proc/ioports 中。（存储设备中V3之前的采取request的方法，后面的采取bios预留的方法）
+
+访问端口：使用 inb、outb 等专用函数进行读写。
+
+释放端口：使用 release_region 函数释放不再使用的端口。
+
+如果需要模块运行时调整参数，使用 module_param。
+如果需要内核启动时传递平台参数，使用 __setup。
+
+内核模块默认不会被重复加载，除非使用 --force 强制操作。
+自动加载机制（如 udevd 和 modprobe）会避免重复加载。
+重复加载的风险通常来自配置错误或强制命令，可通过检查 lsmod 和 dmesg 验证模块状态。
+
+static int pesw_sda_hold_time = 1;
+module_param(pesw_sda_hold_time,int,S_IRUGO|S_IWUSR);
+MODULE_PARM_DESC(pesw_sda_hold_time, "pesw_sda_hold_time(default=1)");
+
+i2c-designware-core.conf
+
+options i2c-designware-core pesw_sda_hold_time=5
+
+IIC相关：
+
+t_{SU:STA}	Start Setup Time	起始条件前，SCL必须为高的最短时间。	SDA的下降沿	确保起始条件被可靠识别。
+t_{HD:STA}	Start Hold Time	起始条件后，SCL必须保持为低的最短时间。	SDA的下降沿	给从设备响应起始信号的时间。
+t_{SU:DAT}	Data Setup Time	SCL上升沿前，数据必须稳定的最短时间。	SCL的上升沿	核心：确保数据被可靠采样。
+t_{HD:DAT}	Data Hold Time	SCL下降沿后，数据必须保持稳定的最短时间。	SCL的下降沿	确保数据位完整结束。
+t_{SU:STO}	Stop Setup Time	停止条件前，SCL必须为高的最短时间。	SDA的上升沿	确保停止条件被可靠识别。
+
+如果主设备在SCL下降沿瞬间就改变SDA，这个快速的跳变可能会通过电路耦合或信号反射，影响到刚刚完成采样的从设备内部电路，尤其是在高总线电容或长走线的情况下。
+
+t_{HD:DAT} 的作用： 它提供了一个缓冲期，让从设备的采样电路在读取数据后能稳定下来，与总线上的任何后续变化隔离开来。
+
+硬件之前就是scl下降曲线和sda上升曲线快重合了，就会导致采样电路没有稳定下来，个人理解硬件的之所以快重合，变为了间隔大，就是加大了sda的保持时间，如何保持时间
+向右移动，变化时间也像右移，所以就不会重合了，所以那个裕量就是所定的电平0的scl和sda的间隔时间
+
+情况A：满足保持时间 (稳定可靠)
+SDA   _______██████████``````````____________
+                  │           │
+SCL   ─────────────└───────────┘─────────────
+                  从设备在上升沿  主设备在下降沿后
+                  读到明确的‘1’  等待t_{HD:DAT}才改变SDA
+
+情况B：保持时间为零或太小 (潜在风险)
+SDA   _______████████``````````______________
+                  │  │
+SCL   ─────────────└──┘──────────────────────
+                  从设备在上升沿  主设备在下降沿
+                  读到‘1’       立即改变SDA
+				  
+
+内核编译模块：
+make -C /usr/src/kernels/linux-5.4.20 M=/home/lichengjuan/kernel_make/linux-5.4.20/drivers/i2c modules
+
+make -C /usr/src/kernels/linux-5.10.0_hotplug M=/driver/h10235/kernel_make/kernel/drivers/i2c modules
+
+
+make -C /usr/src/kernels/linux-5.10.0 M=/driver/h10235/kernel_make/kernel/drivers/i2c/ modules
+　　"-C"：表示进入指定目录中
+
+　　PWD：获取当前所在路径
+
+　　SUBDIRS=$(PWD)：告诉内核源码到指定目录去编译内核程序
+
+　　clean：执行 make clean 时删除生成的目标文件
+
+du * -sh 看具体文件的大小
+
+make menuconfig 内核最后编译执行这个会出现一个界面
+
+iic工具：
+
+./i2cset -f -y 1 0x20 0x77 0x3f 给iic1挂载器件的0x77位器件偏移0x77 写0x3f这个数据
+./i2cget -f -y 1 0x20 0x77 数值是0x3f
+./i2cset -f -y 1 0x20 0x77 0x3f （设置i2c-1上0x20器件的0x77寄存器值为0x3f）
+
+./i2cdetect -r -y 0 扫描总线1上的设备
+
+./i2cdetect -F 0 查询总线0的功能
+
+./i2cdetect -l 检测当前系统有几组i2c总线
+
+设置i2c-1上0x20器件的0x77寄存器值为0x3f
+./i2cset -f -y 1 0x20 0x77 0x3f
+读取i2c-1上0x20器件的0x77寄存器值
+./i2cget -f -y 1 0x20 0x77
+
+读取i2c1上0x38器件的所有寄存器
+./i2cdump -f -y -a 1 0x38
+
+查看系统上存在的 i2c 总线及其设备地址   ls /sys/bus/i2c/devices/
+
+
+查看系统上存在的 i2c 总线及其设备地址   ls /sys/bus/i2c/devices/
+
+修改syslog日志告警级别 vi  /etc/rsyslog.conf   ;service rsyslog restart
+
+格式化文件系统：
+内核中的模块：ext4, xfs, vfat
+Linux的虚拟文件系统：VFS
+用户空间的管理工具：mkfs.ext4, mkfs.xfs,mkfs.vfat
+cat /proc/filesystems
+
+逻辑卷：动态智能管理空间
+当你听到"LVM"时，就想象那个可以随时调整大小的智能图书馆，是不是感觉清晰多了
+
+查看pci设备的配置空间内容
+PCI设备的配置空间共由 64个字节组成，其地址范围为 0x00 ~ 0x3F，这 64个字节是所有 PCI设备必须支持的
+lspci -s 17:00.0 -xxx
+修改 0a:00.0设备配置空间 A0地址处 1字节的内容
+$ setpci -s 0a:00.0 A0.b=0x01 
+
+不同内核传参方式对比
+为了帮助您更好地理解何时该使用哪种方式，这里有一个简单的对比：
+
+使用场景	操作方法	特点
+启动时自动加载/系统级固定配置	在 /etc/modprobe.d/ 下配置 .conf 文件	持久化，配置一次后每次启动自动生效；便于集中管理和自动化部署。
+临时测试或手动调试	使用 insmod 或 modprobe 在命令行直接指定	灵活快捷，但每次加载都需要重新输入命令。
+运行时临时修改	通过 sysfs 接口（如 echo value > /sys/module/module_name/parameters/param_name）	无需重新加载模块即可动态调整部分参数，但非持久化，重启后失效。
+
+cat i2c-designware-core.conf
+options i2c-designware-core pesw_sda_hold_time=5
+
+module_param(scu_disk_slot,int,S_IRUGO|S_IWUSR);
+MODULE_PARM_DESC(scu_disk_slot, "scu disk slot(default=-1)");
+cat /sys/module/sata_drv_interface/parameters/scu_disk_slot
+
+内核符号表的意义
+{
+	地址解析 让模块能找到内核函数的实际位置
+}
+
+cat /proc/kallsyms
+可以查看内核符号表
+
+A和B两个程序运行的时候，库的代码分别被加载到两个进程中，那么每个进程中的库代码访问的是各自进程地址空间中的全局变量，所以值不一样是正常的。
+
+kmalloc分配的有两种标志一种是GFP_KERNEL，另一种是GFP_ATOMIC。
+GFP_KERNEL：表示可以睡眠的分配方式，适用于进程上下文中使用，可以进行阻塞等待。
+GFP_ATOMIC：表示不可睡眠的分配方式，适用于中断上下文或自旋锁保护的代码中，不能进行阻塞等待。
+不同的上下文环境下，选择合适的GFP标志非常重要，以确保内核的稳定性和性能。以下是一些常见的上下文类型及其对应的GFP标志：
+上下文类型	是否可以休眠	使用的 GFP 标志	原因
+上下文类型       | 是否可以休眠 | 使用的 GFP 标志  | 原因
+----------------|--------------|------------------|------------------------------
+系统调用        | 可以         | GFP_KERNEL       | 代表用户进程，可以调度
+内核线程        | 可以         | GFP_KERNEL       | 是真正的进程，可以调度
+工作队列        | 可以         | GFP_KERNEL       | 在工作进程上下文中运行
+硬件中断        | 不可以       | GFP_ATOMIC       | 打断了任意进程，不是进程上下文
+软中断          | 不可以       | GFP_ATOMIC       | 在中断上下文中运行
+Tasklet         | 不可以       | GFP_ATOMIC       | 本质是软中断
+定时器回调      | 不可以       | GFP_ATOMIC       | 在中断上下文中运行
+持有自旋锁      | 不可以       | GFP_ATOMIC       | 休眠会导致死锁
+关闭抢占        | 不可以       | GFP_ATOMIC       | 调度被限制
+
+******************************************************************************************************************
+
+第九章 与硬件通信
+******************************************************************************************************************
+特性        | I/O 端口 (PMIO)                 | I/O 内存 (MMIO)
+-----------|---------------------------------|----------------------------------------
+地址空间    | 独立的 I/O 地址空间             | 与内存共享地址空间
+访问指令    | 专用 I/O 指令（IN/OUT）         | 普通内存访问指令
+地址大小    | 通常 16 位（64K 端口）         | 32 位或 64 位
+性能        | 较慢                            | 较快（可利用缓存）
+常见设备    | 传统 PC 设备（DMA、中断控制器） | 现代设备（PCIe、显卡）
+映射需求    | 不需要映射                      | 需要映射到虚拟地址空间
+Linux API   | inb()/outb() 系列               | ioread()/iowrite() 系列
+
+
+内存页是操作系统内存管理的原子单位，它：
+
+将物理内存和虚拟内存划分成固定大小的块
+
+通过页表建立虚拟页到物理页的映射
+
+支持虚拟内存，让程序使用比物理内存更大的地址空间
+
+提供内存保护，每页可设置不同权限
+
+实现按需加载，提高内存利用率
+
+关键数字：
+
+典型页大小：4KB（0x1000字节）
+
+pci桥分透明桥和非透明桥，非透明桥一般用于双处理器直接的数据交换
+
+cat /proc/iomem  # 显示所有内存映射的IO区域
+cat /proc/ioports  # 显示所有IO端口分配
+
+
+lspci -k 可以查看所有设备对应的驱动程序
+
+可用的内核参数在目录/proc/sys中
+vi /etc/sysctl.conf
+列
+#禁用包过滤功能
+net.ipv4.ip_forward = 0 
+
+[root@localhost ~]# lspci -n
+00:00.0 0600: 1d94:1450
+00:01.0 0600: 1d94:1452
+00:01.1 0604: 1d94:1453
+查看pci设备的厂商和设备id号
+lspci -nn
+[root@localhost ~]# lspci -nn
+00:00.0 Host bridge [0600]: Chengdu Haiguang IC Design Co., Ltd. Root Complex [1d94:1450]
+00:01.0 Host bridge [0600]: Chengdu Haiguang IC Design Co., Ltd. PCIe Dummy Host Bridge [1d94:1452]
+查看更具体的设备信息
+lspci -vvv -s 00:1f.4
+
+
+bootloader：包括很多种，如U-Boot（常用于ARM和嵌入式系统）、GRUB（常用于x86的Linux）、LILO（Linux Loader）、Windows的bootmgr等。
+
+可修改某个中断所绑定的cpu
+[root@localhost 165]# pwd
+/proc/irq/165
+[root@localhost 165]# echo 02 > smp_affinity
+[root@localhost 165]#
+
+make -j32 V=1可以看出利用32个核进行编译，同时V=1可以看到具体的编译命令
+
+内核模块相应的启动顺序，pci位于postcore_initcall和arch_initcall之间，pci设备的驱动程序一般会在subsys_initcall阶段被加载，而pci总线的初始化则在postcore_initcall阶段完成。
+pure_initcall → core_initcall → postcore_initcall → arch_initcall → 
+subsys_initcall → fs_initcall → device_initcall → late_initcall
+
+volatile 的核心作用就是告诉编译器"不要优化这个内存访问，老老实实地每次都去硬件那里读取！
+
+"睡眠"（sleep） = 进程主动让出CPU，等待某个条件满足后被唤醒
+
+持有自旋锁 = 必须快速完成，不能让出CPU
+
+自旋锁：为了在中断上下文也能用，设计成不能睡眠（因为中断根本无法睡眠）
+互斥锁：为了在进程上下文能高效处理长等待，设计成可睡眠（避免浪费CPU）
+
+当一个线程试图获取已经被其他线程持有的 mutex 时，它会被挂起。挂起意味着该线程会被操作系统调度器切换出去，直到锁可用时再被唤醒。
+
+当一个线程试图获取已被持有的自旋锁时，它会进行忙等待（自旋），不断检查锁是否可用，而不是进入休眠状态。
+
+arm架构不支持io端口访问,支持mmio访问，x86则都支持
+
+[root@localhost 0000:30:00.0]# lspci -vvv -s 30:00.0 |grep -A 5 "Region"
+        Region 0: Memory at 81200000 (64-bit, non-prefetchable) [size=16K]
+lspci查询到的是物理地址，通过下面的lspci -xxx -s也是可以看出的第一个bar就存着物理地址，低四位是对
+地址类型的判断
+BAR0 低4位 = 0x4 = 0100b
+
+bit 0 = 0 → 内存空间（非I/O）
+bit 2:1 = 10 → 64位地址空间
+bit 3 = 0 → 非预取内存
+bit 4-31 = 基地址
+[root@localhost 0000:30:00.0]# lspci -xxx -s 30:00.0
+30:00.0 Non-Volatile memory controller: Intel Corporation PCIe Data Center SSD (rev 01)
+00: 86 80 53 09 06 04 10 00 01 02 08 01 10 00 00 00
+10: 04 00 20 81 00 00 00 00 00 00 00 00 00 00 00 00
+
+cd /sys/bus/pci/devices/0000:30:00.0
+# 查看致命错误
+cat aer_dev_fatal
+
+# 查看非致命错误
+cat aer_dev_nonfatal
+
+# 查看可纠正错误
+cat aer_dev_correctable
+
+lspci -vvv -s 30：00.0的AER显示中
+Q：UESta和UESvrt的关系？
+
+UESta置位 (+)   │  ← 记录"发生了什么"
+查询UESvrt      │  ← 判断"有多严重"
+A：
+
+UESta是状态寄存器，报告错误是否发生
+UESvrt是配置寄存器，预定义每个错误的严重程度
+
+一个桥能管理多个总线吗？	不能，每个桥只管理一个subordinate bus
+
+概念	中文	数量	含义
+Primary Bus	主总线	1个	桥所在的总线
+Secondary Bus	次级总线	1个	桥直接连接的下级总线
+Subordinate Bus	从属总线	1个	下级总线的最大编号
+在pci配置的0x18 0x19 0x20寄存器的位置
+
+作用：PCI事务路由
+- 如果目标总线 < Primary    → 往上游转发
+- 如果目标总线 = Secondary  → 发送到该总线
+- 如果目标总线 > Secondary 且 ≤ Subordinate → 往下游转发
+
+MSI中断申请流程
+1：检查设备是否支持msi
+if (pci_find_capability(pdev, PCI_CAP_ID_MSI)) {
+    // 设备支持MSI
+}
+// 检查设备是否支持MSI-X
+if (pci_find_capability(pdev, PCI_CAP_ID_MSIX)) {
+    // 设备支持MSI-X
+}
+2：申请msi中断
+// 申请MSI中断（1-4个向量）
+int vectors = pci_alloc_irq_vectors(pdev, 1, 4, PCI_IRQ_ALL_TYPES);
+
+// 获取中断号
+int irq = pci_irq_vector(pdev, 0);
+3：注册中断处理函数
+request_irq(irq, my_interrupt_handler, 0, "my_device", dev);
+4：中断处理
+my_interrupt_handler的实现
+
+动作,执行者,目的
+创建 pci_dev,PCI 核心层,在内核软件层面建立该物理设备的抽象对象，存储设备身份信息。
+分配物理 BAR 地址,PCI 核心层,在 PCI 总线地址空间内为设备划拨“地皮”（物理地址区间），并写入设备配置空间。
+开启设备电源与中断,NVMe 驱动,通过 pci_enable_device 激活硬件，使其从低功耗状态唤醒并准备好处理中断。
+虚拟地址映射 (ioremap),NVMe 驱动,将分配好的物理 BAR 地址映射到内核虚拟地址空间，使驱动能通过指针读写 SSD 寄存器。
+
+先把第一个桥的整棵子树（包括子桥、孙桥）全分配完，再回头分配第二个桥的子树。 这是深度优先遍历，Bus号是按发现Bridge的先后顺序递增的，不是按层级分配的。
+
+学习路线模板：
+1. PCIe 基础：枚举、配置空间、BAR、MSI/MSI-X、DMA
+2. PCIe 设备驱动模板
+3. NVMe 驱动核心流程
+4. blk-mq / queue / doorbell / completion
+5. PCIe 总线驱动、RC、资源分配、MSI domain
+
+/sys/bus/按物理连接分类（PCI/I2C/USB），/sys/class/按功能分类（hwmon/net/block），/sys/devices/是真实物理拓扑，bus和class下都是指向devices的软链接。同一个设备从不同维度看会出现在不同位置。

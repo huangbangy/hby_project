@@ -1,0 +1,21 @@
+1)模块化编译，两种方式都可以
+[root@compile25182 pci_counter]# cat Makefile
+obj-m += pci_counter.o
+
+all:
+        make -C /usr/src/kernels/linux-5.10.0/ M=$(PWD) modules
+
+clean:
+        make -C /usr/src/kernels/linux-5.10.0/ M=$(PWD) clean
+
+
+
+[root@compile25182 pci_counter]# cat Makefile.org
+obj-m += pci_counter.o
+
+all:
+        make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+
+clean:
+        make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+

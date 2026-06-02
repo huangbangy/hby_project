@@ -1,0 +1,49 @@
+内核中解决抢占的办法是自旋锁和信号量
+
+进程调度分为抢占式多任务（大部分操作系统）和非抢占式多任务
+
+进程都会有它的优先级，可以根据nice值来判定，ps -el可以查看nice值，nice值越小优先级越高
+
+linux调度算法的概念就是根据进程的不同类型分配不同比例的时间片
+
+一个进程会有不同的系统调用可以改变它调度或者获取相关调度的优先级或者对指定处理器的依赖性
+
+内核常用的数据结构：
+链表
+队列
+映射
+二叉树
+
+request_irq: 需要手动管理中断的分配和释放，适用于需要更多控制的场景。
+devm_request_irq: 自动管理中断的分配和释放，简化代码并减少潜在的资源管理问题，适用于使用设备管理器的驱动程序。
+
+static int scsi_host_init(struct Scsi_Host *host)
+{
+    int ret;
+
+    // 初始化任务队列
+    tasklet_init(&host->scsi_tasklet, scsi_tasklet_action, (unsigned long)host);
+
+    // 注册中断处理程序
+    ret = request_irq(host->irq, scsi_interrupt_handler, IRQF_SHARED, "scsi", host);
+    if (ret) {
+        printk(KERN_ERR "Failed to request IRQ %d\n", host->irq);
+        return ret;
+    }
+
+    return 0;
+}
+软中断（下部分）
+中断（上部分）
+
+=====
+看到157
+
+自旋锁（Spinlock）
+短时间持有: 适用于持有时间非常短的临界区，因为线程在等待期间会消耗 CPU 时间。
+低延迟: 由于没有涉及线程调度，自旋锁通常提供较低的延迟。
+单处理器环境: 在单处理器环境中，自旋锁可能会导致死锁，因为线程在等待时无法让出 CPU。
+互斥锁（Mutex）
+长时间持有: 适用于持有时间较长的临界区，因为线程在等待期间会被阻塞，不会消耗 CPU 时间。
+多处理器环境: 适用于多处理器环境，因为线程可以被调度到其他处理器上运行。
+复杂操作: 适用于需要进行复杂操作或涉及睡眠的临界区。

@@ -1,0 +1,38 @@
+正常第一次启动日志打印
+Dec 10 14:48:12 localhost kernel: Call Trace:
+Dec 10 14:48:12 localhost kernel: dump_stack+0x57/0x6e
+Dec 10 14:48:12 localhost kernel: pci_scan_bridge_extend+0x38/0x687
+Dec 10 14:48:12 localhost kernel: ? acpi_evaluate_dsm+0xb0/0x120
+Dec 10 14:48:12 localhost kernel: pci_scan_child_bus_extend.cold+0x19/0xbc
+Dec 10 14:48:12 localhost kernel: acpi_pci_root_create+0x20c/0x270
+Dec 10 14:48:12 localhost kernel: pci_acpi_scan_root+0x1aa/0x1d0
+Dec 10 14:48:12 localhost kernel: ? negotiate_os_control+0x246/0x2ca
+Dec 10 14:48:12 localhost kernel: acpi_pci_root_add.cold+0x5f/0x1b6
+Dec 10 14:48:12 localhost kernel: acpi_bus_attach+0xfd/0x250
+Dec 10 14:48:12 localhost kernel: acpi_bus_attach+0x6e/0x250
+Dec 10 14:48:12 localhost kernel: acpi_bus_attach+0x6e/0x250
+Dec 10 14:48:12 localhost kernel: acpi_bus_scan+0x43/0x90
+Dec 10 14:48:12 localhost kernel: ? acpi_bus_init+0x15f/0x15f
+Dec 10 14:48:12 localhost kernel: acpi_scan_init+0x10e/0x1b4
+Dec 10 14:48:12 localhost kernel: acpi_init+0xce/0x136
+Dec 10 14:48:12 localhost kernel: ? intel_idle_init+0x2b6/0x2b6
+Dec 10 14:48:12 localhost kernel: do_one_initcall+0x41/0x1d0
+Dec 10 14:48:12 localhost kernel: do_initcalls+0xc6/0xdf
+Dec 10 14:48:12 localhost kernel: kernel_init_freeable+0x163/0x1b3
+Dec 10 14:48:12 localhost kernel: ? rest_init+0xb4/0xb4
+Dec 10 14:48:12 localhost kernel: kernel_init+0xa/0x11c
+
+rescan中途调用栈打印
+Dec 10 15:57:49 localhost kernel: Call Trace:
+Dec 10 15:57:49 localhost kernel: dump_stack+0x57/0x6e
+Dec 10 15:57:49 localhost kernel: pci_scan_bridge_extend+0x38/0x687
+Dec 10 15:57:49 localhost kernel: pci_scan_child_bus_extend.cold+0x19/0xbc
+Dec 10 15:57:49 localhost kernel: pci_rescan_bus+0x12/0x30
+Dec 10 15:57:49 localhost kernel: dev_rescan_store+0x68/0x80
+Dec 10 15:57:49 localhost kernel: kernfs_fop_write_iter+0x125/0x1c0
+Dec 10 15:57:49 localhost kernel: new_sync_write+0x119/0x1b0
+Dec 10 15:57:49 localhost kernel: vfs_write+0x1b9/0x280
+Dec 10 15:57:49 localhost kernel: ksys_write+0x5f/0xe0
+Dec 10 15:57:49 localhost kernel: do_syscall_64+0x3d/0x80
+Dec 10 15:57:49 localhost kernel: entry_SYSCALL_64_after_hwframe+0x62/0xc7
+Dec 10 15:57:49 localhost kernel: RIP: 0033:0x7f5d892ed9a7
