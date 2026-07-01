@@ -6,7 +6,7 @@ import { pathToFileURL } from 'node:url';
 
 const root = process.cwd();
 const outputDir = path.join(root, '上架图片');
-const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'xianyu-listing-images-'));
+const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'xianyu-pdf-excerpts-'));
 fs.mkdirSync(outputDir, { recursive: true });
 
 const edgeCandidates = [
@@ -28,15 +28,25 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;');
 }
 
-function pill(text, tone = 'dark') {
-  return `<span class="pill ${tone}">${escapeHtml(text)}</span>`;
+function lines(items) {
+  return items.map((item) => `<li>${escapeHtml(item)}</li>`).join('');
 }
 
-function promptBox(title, content) {
-  return `<div class="prompt-box"><div class="prompt-title">${escapeHtml(title)}</div><pre>${escapeHtml(content)}</pre></div>`;
+function codeBlock(text) {
+  return `<pre>${escapeHtml(text)}</pre>`;
 }
 
-function card(title, subtitle, body, footer = '原创整理｜学习参考｜自行核实') {
+function table(rows) {
+  return `<table>${rows.map((row) => (
+    `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`
+  )).join('')}</table>`;
+}
+
+function note(text) {
+  return `<div class="note">${escapeHtml(text)}</div>`;
+}
+
+function page({ title, subtitle, pageNo, section, body }) {
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -46,317 +56,335 @@ function card(title, subtitle, body, footer = '原创整理｜学习参考｜自
   * { box-sizing: border-box; }
   html, body { width: 1080px; height: 1080px; margin: 0; overflow: hidden; }
   body {
+    display: grid;
+    place-items: center;
     font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", Arial, sans-serif;
-    color: #111827;
-    background:
-      radial-gradient(circle at 92% 8%, rgba(37, 99, 235, 0.12), transparent 260px),
-      linear-gradient(135deg, #fff8d6 0%, #ffffff 42%, #eef6ff 100%);
+    color: #1f2937;
+    background: #e7e7e7;
   }
-  .sheet {
+  .stage {
     position: relative;
     width: 100%;
     height: 100%;
-    padding: 58px 62px 54px;
+    padding: 42px 54px 46px;
   }
-  .topline {
+  .toolbar {
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    margin: 0 auto 18px;
+    width: 880px;
+    border-radius: 10px;
+    color: #4b5563;
+    background: #f8fafc;
+    border: 1px solid #d6d9df;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.08);
+    font-size: 18px;
+  }
+  .toolbar-left, .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    white-space: nowrap;
+  }
+  .dot {
+    width: 13px;
+    height: 13px;
+    border-radius: 999px;
+    background: #cbd5e1;
+  }
+  .dot.dark { background: #64748b; }
+  .file-name { color: #111827; font-weight: 700; }
+  .paper {
+    position: relative;
+    width: 760px;
+    height: 930px;
+    margin: 0 auto;
+    padding: 56px 62px 50px;
+    background: #ffffff;
+    border: 1px solid #d4d4d8;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.2);
+    overflow: hidden;
+  }
+  .clip-mark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(90deg, #cbd5e1, #f8fafc, #cbd5e1);
+  }
+  .doc-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 28px;
+    color: #6b7280;
+    font-size: 15px;
   }
-  .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 25px;
-    font-weight: 800;
-  }
-  .brand-mark {
-    min-width: 46px;
-    height: 46px;
-    display: grid;
-    place-items: center;
-    border-radius: 14px;
-    background: #111827;
-    color: #ffe15a;
-    font-size: 22px;
-    padding: 0 10px;
-  }
-  .tagline {
-    font-size: 21px;
-    color: #4b5563;
-    font-weight: 700;
-  }
+  .doc-meta strong { color: #111827; }
   h1 {
-    margin: 0 0 18px;
-    max-width: 900px;
-    font-size: 68px;
-    line-height: 1.08;
+    margin: 0 0 12px;
+    font-size: 38px;
+    line-height: 1.24;
+    color: #111827;
     letter-spacing: 0;
   }
   .subtitle {
-    max-width: 850px;
-    margin-bottom: 34px;
-    font-size: 31px;
-    line-height: 1.35;
-    color: #374151;
-    font-weight: 700;
+    margin-bottom: 28px;
+    font-size: 21px;
+    line-height: 1.5;
+    color: #4b5563;
   }
-  .pills { display: flex; flex-wrap: wrap; gap: 14px; margin: 8px 0 32px; }
-  .pill {
-    display: inline-flex;
-    align-items: center;
-    min-height: 48px;
-    padding: 10px 18px;
-    border-radius: 999px;
-    font-size: 22px;
-    font-weight: 800;
-    border: 2px solid #111827;
+  h2 {
+    margin: 24px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e5e7eb;
+    font-size: 25px;
+    color: #111827;
+    letter-spacing: 0;
   }
-  .pill.dark { background: #111827; color: #ffffff; }
-  .pill.yellow { background: #ffe15a; color: #111827; }
-  .pill.blue { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
-  .pill.green { background: #dcfce7; color: #047857; border-color: #86efac; }
-  .panel {
-    border: 3px solid #111827;
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 12px 12px 0 #111827;
-    padding: 28px;
+  h3 {
+    margin: 20px 0 10px;
+    font-size: 21px;
+    color: #111827;
   }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-  .mini {
-    min-height: 128px;
-    border-radius: 18px;
-    background: #f9fafb;
-    border: 2px solid #d1d5db;
-    padding: 20px;
-  }
-  .mini strong { display: block; margin-bottom: 8px; font-size: 26px; }
-  .mini span { font-size: 21px; line-height: 1.36; color: #4b5563; }
-  .list { display: grid; gap: 15px; }
-  .line {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    font-size: 28px;
-    line-height: 1.32;
-    font-weight: 800;
-  }
-  .num, .check {
-    flex: 0 0 auto;
-    width: 42px;
-    height: 42px;
-    display: grid;
-    place-items: center;
-    border-radius: 13px;
-    background: #ffe15a;
-    border: 2px solid #111827;
-    font-size: 22px;
-    font-weight: 900;
-  }
-  .check { background: #dcfce7; color: #047857; }
-  .prompt-box {
-    border: 2px solid #d1d5db;
-    border-radius: 18px;
-    background: #f8fafc;
-    padding: 18px;
-  }
-  .prompt-title {
-    margin-bottom: 12px;
-    font-size: 24px;
-    font-weight: 900;
-    color: #1d4ed8;
-  }
-  pre {
-    margin: 0;
-    white-space: pre-wrap;
-    font-family: Consolas, "Microsoft YaHei", monospace;
-    font-size: 20px;
-    line-height: 1.45;
-    color: #1f2937;
-  }
-  .mock {
-    position: relative;
-    min-height: 360px;
-    overflow: hidden;
-  }
-  .doc-page {
-    position: absolute;
-    width: 300px;
-    height: 390px;
-    border: 2px solid #111827;
-    border-radius: 16px;
-    background: #ffffff;
-    box-shadow: 8px 8px 0 rgba(17, 24, 39, 0.18);
-    padding: 22px;
-  }
-  .doc-page:nth-child(1) { left: 22px; top: 26px; transform: rotate(-4deg); }
-  .doc-page:nth-child(2) { left: 314px; top: 2px; transform: rotate(2deg); }
-  .doc-page:nth-child(3) { left: 606px; top: 48px; transform: rotate(-1deg); }
-  .doc-title { height: 24px; width: 78%; border-radius: 8px; background: #111827; margin-bottom: 22px; }
-  .doc-line { height: 12px; border-radius: 999px; background: #d1d5db; margin-bottom: 12px; }
-  .doc-line.short { width: 68%; }
-  .doc-callout {
-    margin-top: 22px;
-    padding: 14px;
-    border-radius: 12px;
-    background: #fff8d6;
-    border: 2px solid #facc15;
+  p {
+    margin: 0 0 14px;
     font-size: 19px;
-    font-weight: 900;
+    line-height: 1.65;
   }
-  .footer {
+  ul, ol {
+    margin: 8px 0 18px 26px;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1.55;
+  }
+  li { margin: 7px 0; }
+  .toc {
+    display: grid;
+    gap: 9px;
+    margin-top: 18px;
+  }
+  .toc-row {
+    display: grid;
+    grid-template-columns: 28px auto minmax(48px, 1fr) auto;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 18px;
+    line-height: 1.35;
+  }
+  .toc-no { width: 24px; color: #6b7280; text-align: right; }
+  .toc-line { border-bottom: 1px dotted #cbd5e1; transform: translateY(-4px); }
+  .toc-page { color: #6b7280; }
+  pre {
+    margin: 12px 0 18px;
+    padding: 18px 20px;
+    white-space: pre-wrap;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: #f8fafc;
+    color: #111827;
+    font-family: Consolas, "Microsoft YaHei", monospace;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 18px;
+    font-size: 17px;
+    line-height: 1.45;
+  }
+  td {
+    border: 1px solid #d1d5db;
+    padding: 11px 12px;
+    vertical-align: top;
+  }
+  td:first-child {
+    width: 112px;
+    color: #111827;
+    font-weight: 700;
+    background: #f8fafc;
+  }
+  .note {
+    margin: 15px 0 18px;
+    padding: 14px 16px;
+    border-left: 4px solid #64748b;
+    background: #f8fafc;
+    color: #374151;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .small {
+    color: #6b7280;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  .page-footer {
     position: absolute;
     left: 62px;
     right: 62px;
-    bottom: 38px;
+    bottom: 28px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    color: #4b5563;
-    font-size: 20px;
-    font-weight: 700;
-  }
-  .badge {
-    padding: 10px 16px;
-    border-radius: 14px;
-    color: #111827;
-    background: #ffe15a;
-    border: 2px solid #111827;
-    font-weight: 900;
+    color: #9ca3af;
+    font-size: 14px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 12px;
   }
 </style>
 </head>
 <body>
-<main class="sheet">
-  <div class="topline">
-    <div class="brand"><div class="brand-mark">文档</div><span>办公效率模板包</span></div>
-    <div class="tagline">真实场景整理</div>
+<main class="stage">
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <span class="dot dark"></span><span class="dot"></span><span class="dot"></span>
+      <span class="file-name">办公效率模板手册.pdf</span>
+    </div>
+    <div class="toolbar-right">
+      <span>PDF 片段预览</span><span>${escapeHtml(pageNo)} / 5</span>
+    </div>
   </div>
-  <h1>${escapeHtml(title)}</h1>
-  <div class="subtitle">${escapeHtml(subtitle)}</div>
-  ${body}
-  <div class="footer"><span>${escapeHtml(footer)}</span><span class="badge">PDF + 模板</span></div>
+  <article class="paper">
+    <div class="clip-mark"></div>
+    <div class="doc-meta"><span><strong>${escapeHtml(section)}</strong></span><span>节选页 ${escapeHtml(pageNo)}</span></div>
+    <h1>${escapeHtml(title)}</h1>
+    <div class="subtitle">${escapeHtml(subtitle)}</div>
+    ${body}
+    <div class="page-footer"><span>个人学习参考资料</span><span>${escapeHtml(pageNo)}</span></div>
+  </article>
 </main>
 </body>
 </html>`;
 }
 
-const cards = [
+function tocRow(no, title, pageNo) {
+  return `<div class="toc-row"><span class="toc-no">${no}</span><span>${escapeHtml(title)}</span><span class="toc-line"></span><span class="toc-page">${pageNo}</span></div>`;
+}
+
+const pages = [
   {
     file: '01-主图-办公效率模板包.png',
-    title: '普通人办公效率模板包',
-    subtitle: '写文案、简历、周报、PPT 的提问方法和可复制模板',
+    title: '普通人办公效率模板手册',
+    subtitle: '智能办公工具提问方法与高频场景模板',
+    pageNo: '01',
+    section: '封面信息',
     body: `
-      <div class="pills">
-        ${pill('100 条模板', 'yellow')}
-        ${pill('36 页 PDF', 'dark')}
-        ${pill('原创整理', 'blue')}
-        ${pill('复制即用', 'green')}
-      </div>
-      <div class="panel mock">
-        <div class="doc-page">
-          <div class="doc-title"></div>
-          <div class="doc-line"></div><div class="doc-line"></div><div class="doc-line short"></div>
-          <div class="doc-callout">写文案</div>
-          <div class="doc-line"></div><div class="doc-line short"></div>
-        </div>
-        <div class="doc-page">
-          <div class="doc-title"></div>
-          <div class="doc-line"></div><div class="doc-line short"></div><div class="doc-line"></div>
-          <div class="doc-callout">改简历</div>
-          <div class="doc-line"></div><div class="doc-line"></div>
-        </div>
-        <div class="doc-page">
-          <div class="doc-title"></div>
-          <div class="doc-line"></div><div class="doc-line"></div><div class="doc-line short"></div>
-          <div class="doc-callout">做周报</div>
-          <div class="doc-line short"></div><div class="doc-line"></div>
-        </div>
-      </div>`,
+      <p>这份资料不是写给技术人员看的，而是给普通人整理的办公提效手册。</p>
+      ${table([
+        ['版本', 'V1.0'],
+        ['适合', '学生、职场新人、资料整理者、闲鱼卖家'],
+        ['内容', '主手册、提问模板速查表、常见场景示例'],
+        ['用途', '个人学习、办公提效、资料整理参考'],
+      ])}
+      ${note('核心思路：先把需求说清楚，再让工具帮你生成初稿、框架、清单或修改建议。')}
+      <h2>目录节选</h2>
+      <ul>
+        ${lines([
+          '提问的 5 个基本公式',
+          '让输出少跑偏的 7 条规则',
+          '写作、职场、求职、学习场景模板',
+          'Excel、PPT、闲鱼卖家常用模板',
+          '100 条可复制提问模板',
+        ])}
+      </ul>
+    `,
   },
   {
     file: '02-内容目录预览.png',
-    title: '一份资料覆盖高频场景',
-    subtitle: '不讲复杂技术，重点给普通人可复制、可修改、可交付的模板',
+    title: '目录',
+    subtitle: '按真实使用场景整理，方便直接翻到需要的部分。',
+    pageNo: '02',
+    section: '目录页',
     body: `
-      <div class="panel">
-        <div class="grid-2">
-          <div class="list">
-            <div class="line"><span class="num">1</span><span>写作：朋友圈、小红书、闲鱼详情</span></div>
-            <div class="line"><span class="num">2</span><span>职场：日报、周报、邮件、会议纪要</span></div>
-            <div class="line"><span class="num">3</span><span>求职：简历优化、JD 分析、面试准备</span></div>
-            <div class="line"><span class="num">4</span><span>学习：笔记、总结、复习计划</span></div>
-          </div>
-          <div class="list">
-            <div class="line"><span class="num">5</span><span>表格：Excel 公式、数据清洗</span></div>
-            <div class="line"><span class="num">6</span><span>PPT：大纲、页面结构、演讲稿</span></div>
-            <div class="line"><span class="num">7</span><span>闲鱼卖家：标题、客服、售后话术</span></div>
-            <div class="line"><span class="num">8</span><span>附赠：提问模板速查表</span></div>
-          </div>
-        </div>
-      </div>`,
+      <div class="toc">
+        ${tocRow('1', '这份手册适合谁', '03')}
+        ${tocRow('2', '智能办公工具能帮普通人做什么', '05')}
+        ${tocRow('3', '提问的 5 个基本公式', '07')}
+        ${tocRow('4', '让输出少跑偏的 7 条规则', '11')}
+        ${tocRow('5', '写作场景：朋友圈、笔记、商品描述', '15')}
+        ${tocRow('6', '职场场景：日报、周报、邮件、纪要', '19')}
+        ${tocRow('7', '求职场景：简历优化、岗位匹配', '22')}
+        ${tocRow('8', '学习场景：读书笔记、课程总结', '25')}
+        ${tocRow('9', '表格场景：公式、清洗、统计口径', '28')}
+        ${tocRow('10', 'PPT 场景：大纲、结构、演讲稿', '30')}
+      </div>
+    `,
   },
   {
     file: '03-提问模板预览.png',
-    title: '模板不是摆设，是真的能复制',
-    subtitle: '把括号里的内容替换成自己的信息，输出会更稳定',
+    title: '公式一：角色 + 任务 + 背景 + 输出格式',
+    subtitle: '把括号里的内容替换成自己的真实信息，输出会更稳定。',
+    pageNo: '03',
+    section: '提问公式',
     body: `
-      <div class="panel grid-2">
-        ${promptBox('通用万能模板', `你是一名【角色】。
+      <h2>通用模板</h2>
+      ${codeBlock(`你是一名【角色】。
 我现在要完成【任务】。
-背景是：【背景】。
-请按照【格式】输出。
-要求：不编造、不夸大。`)}
-        ${promptBox('闲鱼详情模板', `商品：【名称/型号】
-成色：【真实成色】
-卖点：【3-5 个】
-瑕疵：【提前说明】
-请输出标题、详情、问答。`)}
-      </div>`,
+背景是：【背景信息】。
+请你按照【输出格式】给我结果。
+要求：【限制条件】。`)}
+      <h2>示例</h2>
+      ${codeBlock(`你是一名有 5 年经验的电商文案策划。
+我现在要写一条闲鱼商品详情。
+商品是二手平板，成色 95 新，主要卖点是轻薄、适合学习记笔记。
+请输出：标题 5 条、详情文案 1 版、买家常见问题回复 5 条。
+要求：语气真实，不夸张，不承诺全新，不使用违禁词。`)}
+      ${note('如果结果太空泛，通常是背景给得不够。可以继续补充成色、瑕疵、适合人群和交易边界。')}
+    `,
   },
   {
     file: '04-适合人群与使用场景.png',
-    title: '适合想省时间的普通人',
-    subtitle: '学生、职场新人、自由职业者、闲鱼卖家，都能从一个小场景开始用',
+    title: '高频场景片段',
+    subtitle: '从手册正文里截取几类常用场景，适合上架时展示内容密度。',
+    pageNo: '04',
+    section: '场景模板',
     body: `
-      <div class="grid-3">
-        <div class="mini"><strong>学生党</strong><span>整理笔记、复习计划、读书总结、错题分析</span></div>
-        <div class="mini"><strong>职场人</strong><span>日报周报、会议纪要、邮件、PPT 大纲</span></div>
-        <div class="mini"><strong>求职者</strong><span>简历优化、岗位匹配、面试问答准备</span></div>
-        <div class="mini"><strong>闲鱼卖家</strong><span>商品标题、详情页、客服回复、售后说明</span></div>
-        <div class="mini"><strong>内容创作者</strong><span>选题、标题、短视频脚本、改稿润色</span></div>
-        <div class="mini"><strong>自由职业</strong><span>报价说明、交付文案、客户沟通模板</span></div>
-      </div>`,
+      <h2>职场场景</h2>
+      <p>把零散工作流水整理成日报或周报，分为今日完成、遇到问题、明日计划，语气正式但不僵硬。</p>
+      <h2>求职场景</h2>
+      <p>优化简历经历时，重点使用“负责什么 + 采取什么动作 + 使用什么方法 + 带来什么结果”的表达。</p>
+      <h2>学习场景</h2>
+      <p>读书笔记可以整理为核心观点、重要概念、可行动建议、我的应用场景和思考问题。</p>
+      <h2>闲鱼卖家场景</h2>
+      <p>详情页建议包含商品情况、真实卖点、瑕疵说明、适合人群、交易说明和售后边界。</p>
+      ${note('这些片段适合让买家看到资料不是空标题，而是能直接复制修改的模板。')}
+    `,
   },
   {
     file: '05-交付说明与边界.png',
-    title: '交付清楚，边界也清楚',
-    subtitle: '资料产品最怕说不清，这张图适合放最后一张减少误会',
+    title: '交付说明与使用边界',
+    subtitle: '上架最后一张建议放清楚交付内容和注意事项，减少误解。',
+    pageNo: '05',
+    section: '说明页',
     body: `
-      <div class="panel">
-        <div class="grid-2">
-          <div class="list">
-            <div class="line"><span class="check">✓</span><span>交付：PDF 手册 + 提问模板速查表</span></div>
-            <div class="line"><span class="check">✓</span><span>内容：办公、学习、求职、闲鱼卖家模板</span></div>
-            <div class="line"><span class="check">✓</span><span>特点：原创整理、简单直接、适合新手</span></div>
-          </div>
-          <div class="list">
-            <div class="line"><span class="num">!</span><span>只交付资料，不包含其他服务</span></div>
-            <div class="line"><span class="num">!</span><span>模板需要根据个人情况填写</span></div>
-            <div class="line"><span class="num">!</span><span>生成或整理内容请自行检查核实</span></div>
-          </div>
-        </div>
-      </div>`,
+      ${table([
+        ['交付内容', 'PDF 手册 + 提问模板速查表'],
+        ['资料范围', '办公写作、学习整理、求职准备、闲鱼卖家常用模板'],
+        ['使用方式', '复制模板后，替换括号里的个人信息，再根据实际情况修改'],
+        ['注意事项', '内容用于学习参考，涉及事实、政策、价格、规则时请自行核实'],
+      ])}
+      <h2>边界说明</h2>
+      <ul>
+        ${lines([
+          '只交付 PDF 文档和模板表，不包含其他交付内容。',
+          '模板需要按个人情况补充真实信息。',
+          '发布或交付前，请自行检查事实、语气和平台规则。',
+          '不建议写“包学会”“包变现”“保证通过”等夸张表达。',
+        ])}
+      </ul>
+      <p class="small">这张图的作用是提前说清楚资料内容，减少买家误会，也让商品页看起来更像真实文档预览。</p>
+    `,
   },
 ];
 
-function renderPng(cardConfig) {
-  const htmlPath = path.join(tmpDir, cardConfig.file.replace(/\.png$/i, '.html'));
-  const pngPath = path.join(outputDir, cardConfig.file);
-  fs.writeFileSync(htmlPath, card(cardConfig.title, cardConfig.subtitle, cardConfig.body), 'utf8');
+function renderPng(pageConfig) {
+  const htmlPath = path.join(tmpDir, pageConfig.file.replace(/\.png$/i, '.html'));
+  const pngPath = path.join(outputDir, pageConfig.file);
+  fs.writeFileSync(htmlPath, page(pageConfig), 'utf8');
   const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'edge-shot-'));
   try {
     execFileSync(edgePath, [
@@ -377,12 +405,12 @@ function renderPng(cardConfig) {
 }
 
 try {
-  for (const item of cards) {
+  for (const item of pages) {
     renderPng(item);
   }
   console.log(JSON.stringify({
     outputDir,
-    images: cards.map((item) => item.file),
+    images: pages.map((item) => item.file),
   }, null, 2));
 } finally {
   fs.rmSync(tmpDir, { recursive: true, force: true });
