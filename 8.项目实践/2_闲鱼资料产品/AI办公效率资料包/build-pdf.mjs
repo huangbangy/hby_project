@@ -9,8 +9,8 @@ const outDir = path.join(root, 'dist');
 fs.mkdirSync(outDir, { recursive: true });
 
 const documents = [
-  { title: '普通人 AI 办公效率手册', file: 'AI办公效率手册-正文.md' },
-  { title: 'AI 提示词速查表', file: 'AI提示词速查表.md' },
+  { title: '普通人办公效率模板手册', file: 'AI办公效率手册-正文.md' },
+  { title: '提问模板速查表', file: 'AI提示词速查表.md' },
 ];
 
 function escapeHtml(value) {
@@ -180,7 +180,7 @@ const html = `<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>普通人 AI 办公效率手册</title>
+<title>普通人办公效率模板手册</title>
 <style>
   @page { size: A4; margin: 16mm 14mm 18mm; }
   * { box-sizing: border-box; }
@@ -292,12 +292,12 @@ const html = `<!doctype html>
 <body>
 <section class="cover">
   <div class="eyebrow">Original PDF Template Pack</div>
-  <h1>普通人 AI 办公效率手册</h1>
-  <div class="subtitle">DeepSeek / ChatGPT / 通用聊天式 AI 提示词模板与实战案例</div>
+  <h1>普通人办公效率模板手册</h1>
+  <div class="subtitle">智能办公工具提问方法与高频场景模板</div>
   <div class="meta">
     <p><strong>版本：</strong>V1.0</p>
     <p><strong>内容：</strong>主手册 + 提示词速查表</p>
-    <p><strong>声明：</strong>原创整理，仅作学习参考；不售卖账号，不提供违规软件，不承诺收益。</p>
+    <p><strong>声明：</strong>原创整理，仅作学习参考；不售卖账号，不提供软件，不承诺收益。</p>
     <p><strong>生成时间：</strong>${escapeHtml(generatedAt)}</p>
   </div>
 </section>
@@ -333,7 +333,11 @@ try {
     pathToFileURL(htmlPath).href,
   ], { stdio: 'inherit' });
 } finally {
-  fs.rmSync(profileDir, { recursive: true, force: true });
+  try {
+    fs.rmSync(profileDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 200 });
+  } catch {
+    // Edge can keep a temporary profile handle alive briefly after printing.
+  }
 }
 
 const htmlStat = fs.statSync(htmlPath);

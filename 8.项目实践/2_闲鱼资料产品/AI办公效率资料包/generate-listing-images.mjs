@@ -36,7 +36,7 @@ function promptBox(title, content) {
   return `<div class="prompt-box"><div class="prompt-title">${escapeHtml(title)}</div><pre>${escapeHtml(content)}</pre></div>`;
 }
 
-function card(title, subtitle, body, footer = '原创整理｜不卖账号｜不承诺收益') {
+function card(title, subtitle, body, footer = '原创整理｜学习参考｜自行核实') {
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -72,14 +72,15 @@ function card(title, subtitle, body, footer = '原创整理｜不卖账号｜不
     font-weight: 800;
   }
   .brand-mark {
-    width: 46px;
+    min-width: 46px;
     height: 46px;
     display: grid;
     place-items: center;
     border-radius: 14px;
     background: #111827;
     color: #ffe15a;
-    font-size: 24px;
+    font-size: 22px;
+    padding: 0 10px;
   }
   .tagline {
     font-size: 21px;
@@ -231,8 +232,8 @@ function card(title, subtitle, body, footer = '原创整理｜不卖账号｜不
 <body>
 <main class="sheet">
   <div class="topline">
-    <div class="brand"><div class="brand-mark">AI</div><span>办公效率资料包</span></div>
-    <div class="tagline">新手也能直接套用</div>
+    <div class="brand"><div class="brand-mark">文档</div><span>办公效率模板包</span></div>
+    <div class="tagline">真实场景整理</div>
   </div>
   <h1>${escapeHtml(title)}</h1>
   <div class="subtitle">${escapeHtml(subtitle)}</div>
@@ -245,12 +246,12 @@ function card(title, subtitle, body, footer = '原创整理｜不卖账号｜不
 
 const cards = [
   {
-    file: '01-主图-AI办公效率手册.png',
-    title: '普通人 AI 办公效率手册',
-    subtitle: 'DeepSeek / ChatGPT 提示词模板，写文案、简历、周报、PPT 都能用',
+    file: '01-主图-办公效率模板包.png',
+    title: '普通人办公效率模板包',
+    subtitle: '写文案、简历、周报、PPT 的提问方法和可复制模板',
     body: `
       <div class="pills">
-        ${pill('100 条提示词', 'yellow')}
+        ${pill('100 条模板', 'yellow')}
         ${pill('36 页 PDF', 'dark')}
         ${pill('原创整理', 'blue')}
         ${pill('复制即用', 'green')}
@@ -293,15 +294,15 @@ const cards = [
             <div class="line"><span class="num">5</span><span>表格：Excel 公式、数据清洗</span></div>
             <div class="line"><span class="num">6</span><span>PPT：大纲、页面结构、演讲稿</span></div>
             <div class="line"><span class="num">7</span><span>闲鱼卖家：标题、客服、售后话术</span></div>
-            <div class="line"><span class="num">8</span><span>附赠：提示词速查表</span></div>
+            <div class="line"><span class="num">8</span><span>附赠：提问模板速查表</span></div>
           </div>
         </div>
       </div>`,
   },
   {
-    file: '03-提示词模板预览.png',
+    file: '03-提问模板预览.png',
     title: '模板不是摆设，是真的能复制',
-    subtitle: '把括号里的内容替换成自己的信息，就能让 AI 输出更稳定',
+    subtitle: '把括号里的内容替换成自己的信息，输出会更稳定',
     body: `
       <div class="panel grid-2">
         ${promptBox('通用万能模板', `你是一名【角色】。
@@ -338,14 +339,14 @@ const cards = [
       <div class="panel">
         <div class="grid-2">
           <div class="list">
-            <div class="line"><span class="check">✓</span><span>交付：PDF 手册 + 提示词速查表</span></div>
+            <div class="line"><span class="check">✓</span><span>交付：PDF 手册 + 提问模板速查表</span></div>
             <div class="line"><span class="check">✓</span><span>内容：办公、学习、求职、闲鱼卖家模板</span></div>
             <div class="line"><span class="check">✓</span><span>特点：原创整理、简单直接、适合新手</span></div>
           </div>
           <div class="list">
-            <div class="line"><span class="num">!</span><span>不卖账号，不提供违规软件</span></div>
-            <div class="line"><span class="num">!</span><span>不承诺收益，不提供代写作业</span></div>
-            <div class="line"><span class="num">!</span><span>AI 输出内容请自行检查核实</span></div>
+            <div class="line"><span class="num">!</span><span>只交付资料，不包含其他服务</span></div>
+            <div class="line"><span class="num">!</span><span>模板需要根据个人情况填写</span></div>
+            <div class="line"><span class="num">!</span><span>生成或整理内容请自行检查核实</span></div>
           </div>
         </div>
       </div>`,
