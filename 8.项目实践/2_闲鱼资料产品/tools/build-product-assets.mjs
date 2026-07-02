@@ -186,6 +186,19 @@ function generatedAt() {
   }).format(new Date());
 }
 
+function cleanupTempDir(target) {
+  try {
+    fs.rmSync(target, {
+      recursive: true,
+      force: true,
+      maxRetries: 8,
+      retryDelay: 200,
+    });
+  } catch (error) {
+    console.warn(`Warning: could not remove temp directory ${target}: ${error.message}`);
+  }
+}
+
 function pdfHtml(config, productDir) {
   const body = config.docs.map((doc, index) => {
     const content = fs.readFileSync(path.join(productDir, doc.file), 'utf8');
@@ -699,7 +712,7 @@ function renderPdf(config, productDir) {
       pathToFileURL(htmlPath).href,
     ], { stdio: 'inherit' });
   } finally {
-    fs.rmSync(profileDir, { recursive: true, force: true });
+    cleanupTempDir(profileDir);
   }
 
   return { htmlPath, pdfPath };
@@ -731,12 +744,12 @@ function renderImages(config, productDir) {
           pathToFileURL(htmlPath).href,
         ], { stdio: 'inherit' });
       } finally {
-        fs.rmSync(profileDir, { recursive: true, force: true });
+        cleanupTempDir(profileDir);
       }
       files.push(pngPath);
     }
   } finally {
-    fs.rmSync(tmpDir, { recursive: true, force: true });
+    cleanupTempDir(tmpDir);
   }
 
   return { outputDir, files };
