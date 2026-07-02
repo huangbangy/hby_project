@@ -427,6 +427,258 @@ function listingBody(config, card) {
   throw new Error(`Unknown listing card type: ${card.type}`);
 }
 
+function previewFrame(config, card, pageNo, totalPages) {
+  return `<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>${escapeHtml(card.title)}</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { width: 1080px; height: 1080px; margin: 0; overflow: hidden; }
+  body {
+    display: grid;
+    place-items: center;
+    font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", Arial, sans-serif;
+    color: #1f2937;
+    background: #e7e7e7;
+  }
+  .stage { width: 100%; height: 100%; padding: 42px 54px 46px; }
+  .toolbar {
+    width: 880px;
+    height: 58px;
+    margin: 0 auto 18px;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 10px;
+    color: #4b5563;
+    background: #f8fafc;
+    border: 1px solid #d6d9df;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.08);
+    font-size: 18px;
+  }
+  .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+  .dot { width: 13px; height: 13px; border-radius: 999px; background: #cbd5e1; }
+  .dot.dark { background: #64748b; }
+  .file-name { color: #111827; font-weight: 700; }
+  .paper {
+    position: relative;
+    width: 760px;
+    height: 930px;
+    margin: 0 auto;
+    padding: 56px 62px 50px;
+    background: #ffffff;
+    border: 1px solid #d4d4d8;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.2);
+    overflow: hidden;
+  }
+  .clip-mark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(90deg, #cbd5e1, #f8fafc, #cbd5e1);
+  }
+  .doc-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    color: #6b7280;
+    font-size: 15px;
+  }
+  .doc-meta strong { color: #111827; }
+  h1 {
+    margin: 0 0 12px;
+    font-size: 38px;
+    line-height: 1.24;
+    color: #111827;
+    letter-spacing: 0;
+  }
+  .subtitle {
+    margin-bottom: 26px;
+    font-size: 21px;
+    line-height: 1.5;
+    color: #4b5563;
+  }
+  h2 {
+    margin: 22px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e5e7eb;
+    font-size: 25px;
+    color: #111827;
+  }
+  p { margin: 0 0 14px; font-size: 19px; line-height: 1.65; }
+  ul, ol { margin: 8px 0 18px 26px; padding: 0; font-size: 18px; line-height: 1.55; }
+  li { margin: 7px 0; }
+  .toc { display: grid; gap: 9px; margin-top: 18px; }
+  .toc-row {
+    display: grid;
+    grid-template-columns: 28px auto minmax(48px, 1fr) auto;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 18px;
+    line-height: 1.35;
+  }
+  .toc-line { border-bottom: 1px dotted #cbd5e1; transform: translateY(-4px); }
+  .toc-page { color: #6b7280; }
+  pre {
+    margin: 12px 0 18px;
+    padding: 18px 20px;
+    white-space: pre-wrap;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: #f8fafc;
+    color: #111827;
+    font-family: Consolas, "Microsoft YaHei", monospace;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 17px; line-height: 1.45; }
+  td { border: 1px solid #d1d5db; padding: 11px 12px; vertical-align: top; }
+  td:first-child { width: 112px; color: #111827; font-weight: 700; background: #f8fafc; }
+  .note {
+    margin: 15px 0 18px;
+    padding: 14px 16px;
+    border-left: 4px solid #64748b;
+    background: #f8fafc;
+    color: #374151;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .mini {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #f8fafc;
+    padding: 12px 14px;
+    min-height: 86px;
+  }
+  .mini strong { display: block; margin-bottom: 6px; font-size: 18px; color: #111827; }
+  .mini span { display: block; font-size: 15.5px; line-height: 1.45; color: #4b5563; }
+  .page-footer {
+    position: absolute;
+    left: 62px;
+    right: 62px;
+    bottom: 28px;
+    display: flex;
+    justify-content: space-between;
+    color: #9ca3af;
+    font-size: 14px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 12px;
+  }
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <span class="dot dark"></span><span class="dot"></span><span class="dot"></span>
+      <span class="file-name">${escapeHtml(config.title)}.pdf</span>
+    </div>
+    <div class="toolbar-right">
+      <span>PDF 片段预览</span><span>${String(pageNo).padStart(2, '0')} / ${totalPages}</span>
+    </div>
+  </div>
+  <article class="paper">
+    <div class="clip-mark"></div>
+    <div class="doc-meta"><span><strong>${escapeHtml(previewSection(card.type))}</strong></span><span>节选页 ${String(pageNo).padStart(2, '0')}</span></div>
+    <h1>${escapeHtml(card.title)}</h1>
+    <div class="subtitle">${escapeHtml(card.subtitle)}</div>
+    ${previewBody(config, card)}
+    <div class="page-footer"><span>原创整理学习参考</span><span>${String(pageNo).padStart(2, '0')}</span></div>
+  </article>
+</main>
+</body>
+</html>`;
+}
+
+function previewSection(type) {
+  return {
+    cover: '封面信息',
+    list: '目录页',
+    prompts: '模板页',
+    audience: '场景页',
+    delivery: '说明页',
+  }[type] || '内容页';
+}
+
+function previewRows(rows) {
+  return `<table>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`).join('')}</table>`;
+}
+
+function previewList(items, ordered = false) {
+  const tag = ordered ? 'ol' : 'ul';
+  return `<${tag}>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</${tag}>`;
+}
+
+function previewCode(text) {
+  return `<pre>${escapeHtml(text)}</pre>`;
+}
+
+function previewToc(items) {
+  return `<div class="toc">${items.slice(0, 10).map((item, index) => (
+    `<div class="toc-row"><span>${index + 1}</span><span>${escapeHtml(item)}</span><span class="toc-line"></span><span class="toc-page">${String((index + 1) * 3).padStart(2, '0')}</span></div>`
+  )).join('')}</div>`;
+}
+
+function previewBody(config, card) {
+  if (card.type === 'cover') {
+    return `
+      <p>${escapeHtml(config.subtitle)}</p>
+      ${previewRows([
+        ['版本', config.version || 'V1.0'],
+        ['交付', config.deliverySummary || 'PDF 手册 + 模板'],
+        ['适合', (config.coverPills || card.pills || []).slice(0, 4).join('、')],
+        ['用途', '个人学习、资料整理、场景模板参考'],
+      ])}
+      <div class="note">资料为原创整理，仅作学习参考；请按个人真实情况填写、修改和核实。</div>
+      <h2>内容节选</h2>
+      ${previewList((card.pills || config.coverPills || []).slice(0, 5))}
+    `;
+  }
+
+  if (card.type === 'list') {
+    return previewToc(card.items || []);
+  }
+
+  if (card.type === 'prompts') {
+    const prompts = card.prompts || [];
+    return prompts.slice(0, 2).map((item) => `
+      <h2>${escapeHtml(item.title)}</h2>
+      ${previewCode(item.content)}
+    `).join('');
+  }
+
+  if (card.type === 'audience') {
+    return `<div class="grid">${(card.items || []).slice(0, 6).map((item) => `
+      <div class="mini"><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.text)}</span></div>
+    `).join('')}</div>`;
+  }
+
+  if (card.type === 'delivery') {
+    const imageBoundaries = card.imageBoundaries || [
+      '只交付 PDF 文档和模板表',
+      '模板需按个人真实情况填写',
+      '具体效果因个人情况和执行不同',
+      '涉及规则和专业事项请自行核实',
+    ];
+    return `
+      <h2>交付内容</h2>
+      ${previewList(card.deliverables || [])}
+      <h2>使用边界</h2>
+      ${previewList(imageBoundaries)}
+      <div class="note">发布前建议把交付内容、适合人群和边界说明写清楚，减少误解。</div>
+    `;
+  }
+
+  return `<p>${escapeHtml(card.subtitle || config.subtitle)}</p>`;
+}
+
 function renderPdf(config, productDir) {
   const outDir = path.join(productDir, 'dist');
   fs.mkdirSync(outDir, { recursive: true });
@@ -460,10 +712,10 @@ function renderImages(config, productDir) {
   const files = [];
 
   try {
-    for (const card of config.listingImages) {
+    for (const [index, card] of config.listingImages.entries()) {
       const htmlPath = path.join(tmpDir, card.file.replace(/\.png$/i, '.html'));
       const pngPath = path.join(outputDir, card.file);
-      fs.writeFileSync(htmlPath, listingFrame(config, card), 'utf8');
+      fs.writeFileSync(htmlPath, previewFrame(config, card, index + 1, config.listingImages.length), 'utf8');
       const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'edge-shot-'));
       try {
         execFileSync(edgePath, [
