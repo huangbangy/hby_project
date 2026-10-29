@@ -1,0 +1,26 @@
+1：ext4 写文件 → SATA 磁盘的完整源码级链路是什么样的？
+用户态:  write(fd, buf, len)
+           │
+VFS:      vfs_write() → ext4_file_write_iter()
+           │
+ext4:     ext4_buffered_write_iter() → __blockdev_direct_IO() / buffered write
+           │  (Page Cache → 生成bio)
+Block层:  submit_bio() → 设备请求队列 /dev/sdX
+           │  (bio → request, 经IO调度器合并)
+SCSI:     scsi_queue_rq() → 构造 scsi_cmnd (CDB=WRITE_10)
+           │
+libata:   ata_scsi_queuecmd() → ata_scsi_translate() → ata_qc_issue()
+           │  (SCSI命令翻译成ATA任务文件）
+AHCI:     ahci_qc_prep() → ahci_qc_issue() → 写PORT_CMD_ISSUE寄存器
+           │
+硬件:     HBA的DMA引擎搬运数据 → 磁盘
+           │
+完成:     MSI中断 → ahci_intr() → ata_qc_complete() → cmd->scsi_done()
+           │
+SCSI:     scsi_done() → blk_mq_complete_request() → ext4写完成    
+
+2：非 SCSI 设备但模拟成 SCSI 的设备（如 SATA 硬盘、SSD）？
+libata 会进行 SAT 翻译：它会把 SCSI 的 WRITE_10 命令强行拆解并翻译成 ATA 命令（比如 ATA 的 WRITE DMA 或原生命令队列 NCQ 的 WRITE FPDMA QUEUED）。
+
+3：ATA和AHCI的关系是什么？
+现代 SATA 硬盘说的是 ATA 协议，而它插在主板的 AHCI 控制器上。

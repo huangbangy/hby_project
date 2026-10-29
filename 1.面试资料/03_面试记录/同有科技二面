@@ -1,0 +1,52 @@
+1：ext4 写文件 → SATA 磁盘的完整源码级链路是什么样的？
+用户态:  write(fd, buf, len)
+           │
+VFS:      vfs_write() → ext4_file_write_iter()
+           │
+ext4:     ext4_buffered_write_iter() → __blockdev_direct_IO() / buffered write
+           │  (Page Cache → 生成bio)
+Block层:  submit_bio() → 设备请求队列 /dev/sdX
+           │  (bio → request, 经IO调度器合并)
+SCSI:     scsi_queue_rq() → 构造 scsi_cmnd (CDB=WRITE_10)
+           │
+libata:   ata_scsi_queuecmd() → ata_scsi_translate() → ata_qc_issue()
+           │  (SCSI命令翻译成ATA任务文件）
+AHCI:     ahci_qc_prep() → ahci_qc_issue() → 写PORT_CMD_ISSUE寄存器
+           │
+硬件:     HBA的DMA引擎搬运数据 → 磁盘
+           │
+完成:     MSI中断 → ahci_intr() → ata_qc_complete() → cmd->scsi_done()
+           │
+SCSI:     scsi_done() → blk_mq_complete_request() → ext4写完成    
+
+
+2：如果找不到pci设备该怎么分析？
+1）物理层面，换卡，换设备，检查歪针
+2）看bios里面是否可以列举
+3）检查内核的pci开关，和aspm
+4）dmesg查看pci的链路是否报错等问题
+5）通过sepci修改pci的链路速率看能否解决
+
+3：拓展课读一块eeprom概率性失败？
+1）用示波器发现对比过正常的波形，发现了时钟线下拉的时候，sda_hold time过短，导致时序不对
+2）一边尝试改版调电阻和电容，一边我这边debug控制器驱动修改sda_hold_time
+3)最后仅判断产品修改该产品sda_hold_time的形式解决
+
+“扩展框上读背板EEPROM概率性失败。定位：示波器对比正常设备波形，发现扩展框上SDA边沿明显变缓——背板走线长、总线电容大，从机看到数据稳定的时刻整体后移，SCL下降沿后SDA还没稳定控制器就翻转了，tHD;DAT余量不足。对策两条线并行：硬件评估改版调上拉电阻和电容，我这边在DW控制器驱动里debug——初始化时读CPLD识别出扩展框形态，把TX方向的hold时间乘系数放大写进0x7C寄存器，
+并加了幂等标志防止超时恢复和电源管理重复初始化导致hold被反复放大。最后评估下来不改版，软件方案
+
+“I2C驱动栈分三层：i2c-dev是用户态ioctl的翻译层，i2c-core是协议无关的总线模型层，最底下是适配器驱动层——唯一知道控制器寄存器的层。我改的sda_hold_time在适配器层，
+因为它是DW控制器的硬件寄存器0x7C，低16位控制TX方向：SCL下降沿后控制器保持SDA多少个内部时钟才允许翻转，对应规范的tHD;DAT。
+
+4：眼图调优问题？
+我们SATA做过驱动侧的眼图调优。背板走线损耗导致眼图裕量不足，硬件量出每个port的发送幅度校正值，我在驱动初始化时把它们写进PHY寄存器。技术上有两条路径：Marvell 9215控制器的PHY寄存器不在MMIO常规空间，要用B0/B4间接寄存器口——先写地址口指定port号和PHY寄存器偏移，再通过数据口写值，
+写完回读校验；PCH片上SATA则走侧带地址空间，ioremap直写dword6/8/19。参数表按产品、按port定制——同一产品不同port值不同，因为背板走线
+长度不同损耗不同。
+
+5：
+
+
+
+
+结尾：
+问他**“团队驱动和硬件的协作流程是怎样的
